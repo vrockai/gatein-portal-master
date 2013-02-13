@@ -22,46 +22,73 @@
  ******************************************************************************/
 package org.gatein.portlet.responsive.navigation;
 
-import java.net.URI;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import org.gatein.api.PortalRequest;
+import org.gatein.api.navigation.Node;
+import org.gatein.api.navigation.NodePath;
+import org.gatein.api.navigation.Visibility;
 
 /**
- * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author <a href="mailto:vrockai@redhat.com">Viliam Rockai</a>
  * @version $Revision$
  */
-public class Node {
-    private URI uri;
-    private String name;
-    private List<Node> children;
+public class NavigationNodeBean {
 
-    public Node(String name, URI uri) {
-        this.name = name;
-        this.uri = uri;
+    private Node node;
+
+    /* Flag marking currently accessed node */
+    boolean active = false;
+
+    public boolean isSystem(){
+        return node.getVisibility().getStatus().equals(Visibility.Status.SYSTEM);
+    }
+
+    public NavigationNodeBean(Node node) {
+        this.node = node;
+    }
+
+    public void setActive(boolean active){
+        this.active = active;
+    }
+
+    public boolean isActive(){
+        NodePath currentPath = PortalRequest.getInstance().getNodePath();
+        NodePath nodePath = node.getNodePath();
+        if (!active)
+            active = (nodePath != null) ? nodePath.equals(currentPath) : false;
+        return active;
+    }
+
+    public boolean isPage(){
+        return node.getPageId() != null;
+    }
+
+    /* Parent node contains one or more children nodes */
+    public boolean isParent(){
+        return !getChildren().isEmpty();
     }
 
     public String getName() {
-        return name;
+        return node.getDisplayName();
     }
 
     public String getURI() {
-        if (uri != null) {
-            return uri.toString();
-        } else {
-            return null;
-        }
+        return node.getURI();
     }
 
-    public void setChildren(List<Node> children) {
-        if (children != null) {
-            this.children = children;
-        }
-    }
+    public List<NavigationNodeBean> getChildren() {
+        List<NavigationNodeBean> nodes = new ArrayList<NavigationNodeBean>();
 
-    public List<Node> getChildren() {
-        if (children == null) {
-            children = new ArrayList<Node>();
+        Iterator<Node> nodeIterator = node.iterator();
+
+        while(nodeIterator.hasNext()){
+            Node childNode = nodeIterator.next();
+            NavigationNodeBean childNodeBean = new NavigationNodeBean(childNode);
+            nodes.add(childNodeBean);
         }
-        return children;
+
+        return nodes;
     }
 }

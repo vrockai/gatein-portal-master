@@ -1,5 +1,3 @@
-(function($){
-
-	$(window).resize(function(){checkGRHSize();});
-
+(function($){        
+        $(".gtnResponsiveNavigationPortlet").collapsible({navigationToggleSelector:".show-navigation"});
 })(jQuery);
