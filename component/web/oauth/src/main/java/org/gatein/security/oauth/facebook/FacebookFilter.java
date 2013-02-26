@@ -35,6 +35,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.UserProfile;
+import org.exoplatform.services.organization.UserProfileHandler;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.utils.OAuthConstants;
@@ -63,6 +66,8 @@ public class FacebookFilter extends AbstractSSOInterceptor {
     private String appsecret;
     private String scope;
     private GateInFacebookProcessor facebookProcessor;
+
+    private OrganizationService organizationService;
 
     @Override
     protected void initImpl() {
@@ -102,6 +107,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
                 ", redirectURL=" + this.redirectURL);
 
         facebookProcessor = new GateInFacebookProcessor(appid, appsecret, scope, redirectURL);
+        organizationService = (OrganizationService)getExoContainer().getComponentInstanceOfType(OrganizationService.class);
     }
 
     @Override
@@ -148,7 +154,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
             if (principal == null) {
                 log.error("Principal was null. Maybe login modules need to be configured properly.");
             }
-            processPrincipal(httpRequest, httpResponse, principal);
+            processPrincipal(httpRequest, httpResponse, (FacebookPrincipal)principal);
             return;
         }
 
@@ -174,12 +180,16 @@ public class FacebookFilter extends AbstractSSOInterceptor {
             } else {
                 httpRequest.getSession().setAttribute("STATE", FacebookProcessor.STATES.FINISH.name());
                 httpRequest.getSession().setAttribute(OAuthConstants.SESSION_ATTRIBUTE_AUTHENTICATED_PRINCIPAL, principal);
-                processPrincipal(httpRequest, httpResponse, principal);
+                processPrincipal(httpRequest, httpResponse, (FacebookPrincipal)principal);
             }
         }
     }
 
-    protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Principal principal) throws IOException {
+    protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FacebookPrincipal principal) throws IOException {
+        if (log.isTraceEnabled()) {
+            log.trace("Obtained principal from Facebook authentication: " + principal);
+        }
+
         // TODO: Refactor this hackish code by made the method saveSSOCredentials public instead of protected
         new GenericAgent() {
 
@@ -188,11 +198,29 @@ public class FacebookFilter extends AbstractSSOInterceptor {
                 super.saveSSOCredentials(username, httpRequest);
             }
 
-        }.saveSSOCredentials(((FacebookPrincipal)principal).getUsername(), httpRequest);
+        }.saveSSOCredentials(principal.getUsername(), httpRequest);
+
+        saveAccessTokenToUserProfile(principal);
 
         // Now Facebook authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
         String loginRedirectURL = httpResponse.encodeRedirectURL(getLoginRedirectUrl(httpRequest));
         httpResponse.sendRedirect(loginRedirectURL);
+    }
+
+    protected void saveAccessTokenToUserProfile(FacebookPrincipal principal) {
+        try {
+            // TODO: Encode token prior to saving
+            UserProfileHandler userProfileHandler = organizationService.getUserProfileHandler();
+            UserProfile userProfile = userProfileHandler.findUserProfileByName(principal.getUsername());
+            userProfile.setAttribute(OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN, principal.getAccessToken());
+            userProfileHandler.saveUserProfile(userProfile, true);
+
+            if (log.isTraceEnabled()) {
+                log.trace("Facebook accessToken saved to userProfile of user " + principal.getUsername());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Forked from InitiateLoginFilter

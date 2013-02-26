@@ -30,6 +30,9 @@ package org.gatein.security.oauth.utils;
  */
 public class OAuthConstants {
 
+
+    // Properties from configuration.properties
+
     public static final String PROPERTY_FACEBOOK_ENABLED = "gatein.oauth.facebook.enabled";
 
     public static final String PROPERTY_FACEBOOK_APPID = "gatein.oauth.facebook.appid";
@@ -48,9 +51,19 @@ public class OAuthConstants {
 
     public static final String PROPERTY_GOOGLE_CLIENTSECRET = "gatein.oauth.google.clientsecret";
 
+
+    // User profile attributes
+
     public static final String PROFILE_FACEBOOK_USERNAME = "user.social-info.facebook.userName";
 
     public static final String PROFILE_GOOGLE_USERNAME = "user.social-info.google.userName";
+
+    public static final String PROFILE_FACEBOOK_ACCESS_TOKEN = "user.social-info.facebook.accessToken";
+
+    public static final String PROFILE_GOOGLE_ACCESS_TOKEN = "user.social-info.google.accessToken";
+
+
+    // Session attributes
 
     public static final String SESSION_ATTRIBUTE_AUTHENTICATED_PRINCIPAL = "authenticatedPrincipal";
 
