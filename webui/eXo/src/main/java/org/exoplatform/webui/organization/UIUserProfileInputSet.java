@@ -49,6 +49,7 @@ import org.exoplatform.webui.form.UIFormInput;
 import org.exoplatform.webui.form.UIFormInputSet;
 import org.exoplatform.webui.form.UIFormSelectBox;
 import org.exoplatform.webui.form.UIFormStringInput;
+import org.gatein.security.oauth.utils.OAuthConstants;
 
 /**
  * Created by The eXo Platform SARL Author : Dang Van Minh minhdv81@yahoo.com Jun 28, 2006
@@ -63,7 +64,7 @@ public class UIUserProfileInputSet extends UIFormInputSet {
 
     public static final String FEMALE = "female";
 
-    public static final String[] SOCIAL_INFO_KEYS = { "user.social-info.facebook.userName", "user.social-info.google.userName" };
+    public static final String[] SOCIAL_INFO_KEYS = { OAuthConstants.PROFILE_FACEBOOK_USERNAME, OAuthConstants.PROFILE_GOOGLE_USERNAME };
 
     public UIUserProfileInputSet() {
     }

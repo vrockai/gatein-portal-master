@@ -76,6 +76,7 @@
     <!-- SSO deps -->
     <version.cas.client>3.2.1</version.cas.client>
     <version.picketlink.fed>2.1.4.Final</version.picketlink.fed>
+    <version.picketlink.social>2.0.0.2012sep25</version.picketlink.social>
 
     <!--
     Various log4j properties for unit tests, examples:
@@ -519,6 +520,9 @@
       <dependency>
         <groupId>org.gatein.portal</groupId>
         <artifactId>exo.portal.component.web.security-jboss</artifactId>
+      </dependency>
+      <dependency>
+        <artifactId>exo.portal.component.web.oauth</artifactId>
         <version>3.6.0.MO1-SNAPSHOT</version>
       </dependency>
       <dependency>
@@ -1122,6 +1126,11 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
         <version>${version.org.apache.httpcomponents.httpcore}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.picketlink</groupId>
+        <artifactId>picketlink-facebook</artifactId>
+        <version>${version.picketlink.social}</version>
       </dependency>
 
     </dependencies>
