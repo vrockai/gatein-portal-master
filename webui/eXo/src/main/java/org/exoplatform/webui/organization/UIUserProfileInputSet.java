@@ -63,6 +63,8 @@ public class UIUserProfileInputSet extends UIFormInputSet {
 
     public static final String FEMALE = "female";
 
+    public static final String[] SOCIAL_INFO_KEYS = { "user.social-info.facebook.userName", "user.social-info.google.userName" };
+
     public UIUserProfileInputSet() {
     }
 
@@ -83,6 +85,11 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         addInput(businessInputSet, UserProfile.BUSINESE_INFO_KEYS);
         businessInputSet.setRendered(false);
         addUIFormInput(businessInputSet);
+
+        UIFormInputSet socialInputSet = new UIFormInputSet("SocialNetworksInfo");
+        addInput(socialInputSet, SOCIAL_INFO_KEYS);
+        socialInputSet.setRendered(false);
+        addUIFormInput(socialInputSet);
     }
 
     public void reset() {
