@@ -187,6 +187,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
     protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FacebookPrincipal principal) throws IOException {
         if (log.isTraceEnabled()) {
             log.trace("Obtained principal from Facebook authentication: " + principal);
+            log.trace("Facebook accessToken: " + principal.getAccessToken());
         }
 
         // TODO: Refactor this hackish code by made the method saveSSOCredentials public instead of protected
