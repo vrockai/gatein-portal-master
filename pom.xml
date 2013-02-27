@@ -76,7 +76,7 @@
     <!-- SSO deps -->
     <version.cas.client>3.2.1</version.cas.client>
     <version.picketlink.fed>2.1.4.Final</version.picketlink.fed>
-    <version.picketlink.social>2.0.0.2012sep25</version.picketlink.social>
+    <version.picketlink.social>3.0.0-SNAPSHOT</version.picketlink.social>
 
     <!--
     Various log4j properties for unit tests, examples:
@@ -1129,7 +1129,7 @@
       </dependency>
       <dependency>
         <groupId>org.picketlink</groupId>
-        <artifactId>picketlink-facebook</artifactId>
+        <artifactId>picketlink-social</artifactId>
         <version>${version.picketlink.social}</version>
       </dependency>
 

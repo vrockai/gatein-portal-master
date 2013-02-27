@@ -214,7 +214,7 @@
 
     <module-def name="org.gatein.oauth">
       <maven-resource group="org.gatein.portal" artifact="exo.portal.component.web.oauth"/>
-      <maven-resource group="org.picketlink" artifact="picketlink-facebook"/>
+      <maven-resource group="org.picketlink" artifact="picketlink-social"/>
     </module-def>
 
     <module-def name="org.gatein.sso">

@@ -25,6 +25,7 @@ package org.gatein.security.oauth.facebook;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -44,7 +45,8 @@ import org.gatein.security.oauth.utils.OAuthConstants;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
 import org.gatein.wci.security.Credentials;
-import org.picketlink.social.facebook.FacebookProcessor;
+import org.picketlink.social.standalone.fb.FacebookPrincipal;
+import org.picketlink.social.standalone.fb.FacebookProcessor;
 
 /**
  * Filter for integration with authentication handhsake via Facebook with usage of OAuth2
@@ -65,7 +67,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
     private String appid;
     private String appsecret;
     private String scope;
-    private GateInFacebookProcessor facebookProcessor;
+    private FacebookProcessor facebookProcessor;
 
     private OrganizationService organizationService;
 
@@ -106,7 +108,8 @@ public class FacebookFilter extends AbstractSSOInterceptor {
                 ", scope=" + this.scope +
                 ", redirectURL=" + this.redirectURL);
 
-        facebookProcessor = new GateInFacebookProcessor(appid, appsecret, scope, redirectURL);
+        // Use empty rolesList because we don't need rolesList for GateIn integration
+        facebookProcessor = new FacebookProcessor(appid, appsecret, scope, redirectURL, Arrays.asList(new String[]{}));
         organizationService = (OrganizationService)getExoContainer().getComponentInstanceOfType(OrganizationService.class);
     }
 
@@ -130,12 +133,8 @@ public class FacebookFilter extends AbstractSSOInterceptor {
         return scope;
     }
 
-    protected GateInFacebookProcessor getFacebookProcessor() {
+    protected FacebookProcessor getFacebookProcessor() {
         return facebookProcessor;
-    }
-
-    protected void setFacebookProcessor(GateInFacebookProcessor facebookProcessor) {
-        this.facebookProcessor = facebookProcessor;
     }
 
     @Override
@@ -143,7 +142,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpServletResponse httpResponse = (HttpServletResponse)response;
         HttpSession session = httpRequest.getSession();
-        String state = (String) session.getAttribute("STATE");
+        String state = (String) session.getAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
 
         if (log.isTraceEnabled()) {
             log.trace("state=" + state);
@@ -178,7 +177,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
             if (principal == null) {
                 log.error("Principal was null. Maybe login modules need to be configured properly.");
             } else {
-                httpRequest.getSession().setAttribute("STATE", FacebookProcessor.STATES.FINISH.name());
+                httpRequest.getSession().setAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE, FacebookProcessor.STATES.FINISH.name());
                 httpRequest.getSession().setAttribute(OAuthConstants.SESSION_ATTRIBUTE_AUTHENTICATED_PRINCIPAL, principal);
                 processPrincipal(httpRequest, httpResponse, (FacebookPrincipal)principal);
             }

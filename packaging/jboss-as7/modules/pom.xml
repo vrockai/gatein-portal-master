@@ -770,7 +770,7 @@
     </dependency>
     <dependency>
       <groupId>org.picketlink</groupId>
-      <artifactId>picketlink-facebook</artifactId>
+      <artifactId>picketlink-social</artifactId>
     </dependency>
 
     <!-- GateIn -->
