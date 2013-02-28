@@ -109,7 +109,7 @@ public class UIUserInfo extends UIFormTabPane {
                 return;
             }
 
-            // TODO: UserProfile edit was unsuccessful but user has been already edited. Needs to be improved...
+            // TODO: UserProfile save can be unsuccessful, but user info from accountEditInputSet has been already edited. So it's not atomic edit...
             save = uiUserInfo.getChild(UIUserProfileInputSet.class).save(service, uiUserInfo.getUserName(), false);
             if (!save) {
                 return;
