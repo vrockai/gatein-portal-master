@@ -41,6 +41,27 @@
     </init-params>
   </component>
 
+  <component>
+    <key>org.gatein.security.oauth.data.OAuthDataStorage</key>
+    <type>org.gatein.security.oauth.data.OAuthDataStorageImpl</type>
+  </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
+    <component-plugin>
+      <name>UniqueOAuthProviderUsernameListener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.gatein.security.oauth.data.UniqueOAuthProviderUsernameListener</type>
+      <init-params>
+        <values-param>
+          <name>oauthProviderUsernameAttrNames</name>
+          <value>user.social-info.facebook.userName</value>
+          <value>user.social-info.google.userName</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
   <external-component-plugins>
     <target-component>org.gatein.sso.integration.SSOFilterIntegrator</target-component>
     <component-plugin>

@@ -37,11 +37,13 @@ import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.data.OAuthDataStorage;
+import org.gatein.security.oauth.utils.GateInOAuthException;
 import org.gatein.security.oauth.utils.OAuthConstants;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
@@ -192,7 +194,17 @@ public class FacebookFilter extends AbstractSSOInterceptor {
             log.trace("Facebook accessToken: " + principal.getAccessToken());
         }
 
-        // TODO: Refactor this hackish code by made the method saveSSOCredentials public instead of protected
+        User portalUser = oauthDataStorage.findUserByFacebookUsername(principal.getUsername());
+        if (portalUser == null) {
+            // TODO: Here we need to start registration flow
+            throw new GateInOAuthException(OAuthConstants.ERROR_CODE_UNSPECIFIED, "TODO: There is not portalUser corresponding to facebookPrincipal: " + principal);
+        }
+
+        if (log.isTraceEnabled()) {
+            log.trace("Found portalUser " + portalUser + " corresponding to facebookPrincipal with username " + principal.getUsername());
+        }
+
+        // TODO: Refactor this by made the method saveSSOCredentials public instead of protected
         new GenericAgent() {
 
             @Override
@@ -200,9 +212,9 @@ public class FacebookFilter extends AbstractSSOInterceptor {
                 super.saveSSOCredentials(username, httpRequest);
             }
 
-        }.saveSSOCredentials(principal.getUsername(), httpRequest);
+        }.saveSSOCredentials(portalUser.getUserName(), httpRequest);
 
-        oauthDataStorage.saveFacebookAccessToken(principal.getUsername(), principal.getAccessToken());
+        oauthDataStorage.saveFacebookAccessToken(portalUser.getUserName(), principal.getAccessToken());
 
         // Now Facebook authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
         String loginRedirectURL = httpResponse.encodeRedirectURL(getLoginRedirectUrl(httpRequest));

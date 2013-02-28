@@ -62,7 +62,7 @@ public class TestOAuthDataStorage extends AbstractKernelTest {
         end();
     }
 
-    public void testSaveOAuthProviderUsernames() throws Exception {
+    public void testPersistOAuthProviderUsernames() throws Exception {
         User user1 = new UserImpl("testUser1");
         User user2 = new UserImpl("testUser2");
         orgService.getUserHandler().createUser(user1, false);
@@ -102,12 +102,30 @@ public class TestOAuthDataStorage extends AbstractKernelTest {
             userProfile2.setAttribute(OAuthConstants.PROFILE_FACEBOOK_USERNAME, "joseph.doyle.changed");
             orgService.getUserProfileHandler().saveUserProfile(userProfile2, true);
 
-            fail("Exception should occured because of duplicated facebook username");
+            fail("Exception should occur because of duplicated facebook username");
         } catch (GateInOAuthException gtnOauthException) {
             assertEquals(gtnOauthException.getErrorCode(), OAuthConstants.ERROR_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME);
         } catch (Exception e) {
             throw new UndeclaredThrowableException(e);
         }
+    }
+
+    public void testPersistOAuthAccessTokens() throws Exception {
+        User user1 = new UserImpl("testUser1");
+        User user2 = new UserImpl("testUser2");
+        orgService.getUserHandler().createUser(user1, false);
+        orgService.getUserHandler().createUser(user2, false);
+
+        oauthDataStorage.saveFacebookAccessToken(user1.getUserName(), "aaa123");
+        oauthDataStorage.saveFacebookAccessToken(user2.getUserName(), "bbb456");
+        oauthDataStorage.saveGoogleAccessToken(user1.getUserName(), "ccc789");
+
+        assertEquals("aaa123", oauthDataStorage.getFacebookAccessToken(user1.getUserName()));
+        assertEquals("bbb456", oauthDataStorage.getFacebookAccessToken(user2.getUserName()));
+        assertEquals("ccc789", oauthDataStorage.getGoogleAccessToken(user1.getUserName()));
+        assertNull(oauthDataStorage.getGoogleAccessToken(user2.getUserName()));
+
+        // TODO: Verify that accessTokens are encoded by directly access them through userProfiles
     }
 
 }
