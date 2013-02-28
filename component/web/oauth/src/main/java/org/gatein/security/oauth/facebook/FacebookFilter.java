@@ -41,6 +41,7 @@ import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.data.OAuthDataStorage;
 import org.gatein.security.oauth.utils.OAuthConstants;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
@@ -69,7 +70,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
     private String scope;
     private FacebookProcessor facebookProcessor;
 
-    private OrganizationService organizationService;
+    private OAuthDataStorage oauthDataStorage;
 
     @Override
     protected void initImpl() {
@@ -110,7 +111,8 @@ public class FacebookFilter extends AbstractSSOInterceptor {
 
         // Use empty rolesList because we don't need rolesList for GateIn integration
         facebookProcessor = new FacebookProcessor(appid, appsecret, scope, redirectURL, Arrays.asList(new String[]{}));
-        organizationService = (OrganizationService)getExoContainer().getComponentInstanceOfType(OrganizationService.class);
+
+        oauthDataStorage = (OAuthDataStorage)getExoContainer().getComponentInstanceOfType(OAuthDataStorage.class);
     }
 
     @Override
@@ -200,27 +202,11 @@ public class FacebookFilter extends AbstractSSOInterceptor {
 
         }.saveSSOCredentials(principal.getUsername(), httpRequest);
 
-        saveAccessTokenToUserProfile(principal);
+        oauthDataStorage.saveFacebookAccessToken(principal.getUsername(), principal.getAccessToken());
 
         // Now Facebook authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
         String loginRedirectURL = httpResponse.encodeRedirectURL(getLoginRedirectUrl(httpRequest));
         httpResponse.sendRedirect(loginRedirectURL);
-    }
-
-    protected void saveAccessTokenToUserProfile(FacebookPrincipal principal) {
-        try {
-            // TODO: Encode token prior to saving
-            UserProfileHandler userProfileHandler = organizationService.getUserProfileHandler();
-            UserProfile userProfile = userProfileHandler.findUserProfileByName(principal.getUsername());
-            userProfile.setAttribute(OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN, principal.getAccessToken());
-            userProfileHandler.saveUserProfile(userProfile, true);
-
-            if (log.isTraceEnabled()) {
-                log.trace("Facebook accessToken saved to userProfile of user " + principal.getUsername());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // Forked from InitiateLoginFilter

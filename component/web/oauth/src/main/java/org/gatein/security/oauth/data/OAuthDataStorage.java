@@ -21,22 +21,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth;
+package org.gatein.security.oauth.data;
 
-import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OAuthDataStorage {
+public interface OAuthDataStorage {
 
-    private OrganizationService orgService;
+    User findUserByFacebookUsername(String facebookUsername);
 
-    public OAuthDataStorage(OrganizationService orgService) {
-        this.orgService = orgService;
-    }
+    User findUserByGoogleUsername(String googleUsername);
 
-    // public void
+    User findUserByOAuthProviderUsername(String oauthProviderUsernameAttrName, String oauthProviderUsername);
 
+    void saveFacebookAccessToken(String username, String accessToken);
 
+    void saveGoogleAccessToken(String username, String accessToken);
+
+    String getFacebookAccessToken(String username);
+
+    String getGoogleAccessToken(String username);
 }
