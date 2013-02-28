@@ -34,8 +34,9 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.impl.UserImpl;
+import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.data.OAuthDataStorage;
-import org.gatein.security.oauth.utils.GateInOAuthException;
+import org.gatein.common.exception.GateInException;
 import org.gatein.security.oauth.utils.OAuthConstants;
 
 /**
@@ -103,8 +104,10 @@ public class TestOAuthDataStorage extends AbstractKernelTest {
             orgService.getUserProfileHandler().saveUserProfile(userProfile2, true);
 
             fail("Exception should occur because of duplicated facebook username");
-        } catch (GateInOAuthException gtnOauthException) {
-            assertEquals(gtnOauthException.getErrorCode(), OAuthConstants.ERROR_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME);
+        } catch (GateInException gtnOauthException) {
+            assertEquals(GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME, gtnOauthException.getExceptionCode());
+            assertEquals(OAuthConstants.PROFILE_FACEBOOK_USERNAME, gtnOauthException.getExceptionAttribute(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME));
+            assertEquals("joseph.doyle.changed", gtnOauthException.getExceptionAttribute(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME));
         } catch (Exception e) {
             throw new UndeclaredThrowableException(e);
         }

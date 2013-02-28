@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -49,6 +50,8 @@ import org.exoplatform.webui.form.UIFormInput;
 import org.exoplatform.webui.form.UIFormInputSet;
 import org.exoplatform.webui.form.UIFormSelectBox;
 import org.exoplatform.webui.form.UIFormStringInput;
+import org.gatein.common.exception.GateInException;
+import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.utils.OAuthConstants;
 
 /**
@@ -210,7 +213,7 @@ public class UIUserProfileInputSet extends UIFormInputSet {
     }
 
     @SuppressWarnings("deprecation")
-    public void save(OrganizationService service, String user, boolean isnewUser) throws Exception {
+    public boolean save(OrganizationService service, String user, boolean isnewUser) throws Exception {
         user_ = user;
         UserProfileHandler hanlder = service.getUserProfileHandler();
         UserProfile userProfile = hanlder.findUserProfileByName(user_);
@@ -230,16 +233,31 @@ public class UIUserProfileInputSet extends UIFormInputSet {
             }
         }
 
-        hanlder.saveUserProfile(userProfile, true);
-
-        Object[] args = { "UserProfile", user_ };
         WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
         UIApplication uiApp = context.getUIApplication();
+
+        try {
+            hanlder.saveUserProfile(userProfile, true);
+        } catch (GateInException gtnOauthException) {
+            // Show warning message if user with this facebookUsername (or googleUsername) already exists
+            if (gtnOauthException.getExceptionCode() == GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
+                Object[] args = convertOAuthExceptionAttributes(gtnOauthException.getExceptionAttributes());
+                ApplicationMessage appMessage = new ApplicationMessage("UIUserProfileInputSet.msg.oauth-username-exists", args, ApplicationMessage.WARNING);
+                appMessage.setArgsLocalized(false);
+                uiApp.addMessage(appMessage);
+                return false;
+            } else {
+                throw gtnOauthException;
+            }
+        }
+
+        Object[] args = { "UserProfile", user_ };
         if (isnewUser) {
             uiApp.addMessage(new ApplicationMessage("UIAccountInputSet.msg.successful.create.user", args));
-            return;
+            return true;
         }
         uiApp.addMessage(new ApplicationMessage("UIUserProfileInputSet.msg.sucsesful.update.userprofile", args));
+        return true;
     }
 
     private String capitalizeFirstLetter(String word) {
@@ -266,5 +284,20 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         public int compare(SelectItemOption item0, SelectItemOption item1) {
             return item0.getLabel().compareToIgnoreCase(item1.getLabel());
         }
+    }
+
+    private Object[] convertOAuthExceptionAttributes(Map<String, Object> exceptionAttribs) {
+        String oauthProviderUsernameAttrName = (String)exceptionAttribs.get(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME);
+        ResourceBundle resBundle = WebuiRequestContext.getCurrentInstance().getApplicationResourceBundle();
+        String localizedOAuthProviderUsernameAttrName;
+        try {
+            localizedOAuthProviderUsernameAttrName = resBundle.getString("UIUserInfo.label." + oauthProviderUsernameAttrName);
+        } catch (MissingResourceException mre) {
+            localizedOAuthProviderUsernameAttrName = oauthProviderUsernameAttrName;
+        }
+
+        Object oauthProviderUsername = exceptionAttribs.get(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME);
+
+        return new Object[] { localizedOAuthProviderUsernameAttrName, oauthProviderUsername };
     }
 }

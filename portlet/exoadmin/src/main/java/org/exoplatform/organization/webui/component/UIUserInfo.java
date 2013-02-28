@@ -108,7 +108,12 @@ public class UIUserInfo extends UIFormTabPane {
             if (!save) {
                 return;
             }
-            uiUserInfo.getChild(UIUserProfileInputSet.class).save(service, uiUserInfo.getUserName(), false);
+
+            // TODO: UserProfile edit was unsuccessful but user has been already edited. Needs to be improved...
+            save = uiUserInfo.getChild(UIUserProfileInputSet.class).save(service, uiUserInfo.getUserName(), false);
+            if (!save) {
+                return;
+            }
 
             if (uiUserInfo.getUserName().equals(event.getRequestContext().getRemoteUser())) {
                 UserProfileHandler hanlder = service.getUserProfileHandler();

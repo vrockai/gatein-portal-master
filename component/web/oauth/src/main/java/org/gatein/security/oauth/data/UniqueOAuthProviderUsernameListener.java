@@ -23,14 +23,16 @@
 
 package org.gatein.security.oauth.data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
-import org.gatein.security.oauth.utils.GateInOAuthException;
-import org.gatein.security.oauth.utils.OAuthConstants;
+import org.gatein.common.exception.GateInException;
+import org.gatein.common.exception.GateInExceptionConstants;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -56,9 +58,13 @@ public class UniqueOAuthProviderUsernameListener extends UserProfileEventListene
 
             User foundUser = oauthDataStorage.findUserByOAuthProviderUsername(oauthProviderUsernameAttrName, oauthProviderUsername);
             if (foundUser != null && !user.getUserName().equals(foundUser.getUserName())) {
-                throw new GateInOAuthException(OAuthConstants.ERROR_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME, "Attempt to save " + oauthProviderUsernameAttrName
-                        + " with value " + oauthProviderUsername + " but it already exists. currentUser=" + user.getUserName()
-                        + ", userWithThisOAuthUsername=" + foundUser.getUserName());
+                String message = "Attempt to save " + oauthProviderUsernameAttrName + " with value " + oauthProviderUsername +
+                        " but it already exists. currentUser=" + user.getUserName() + ", userWithThisOAuthUsername=" + foundUser.getUserName();
+                Map<String, Object> exceptionAttribs = new HashMap<String, Object>();
+                exceptionAttribs.put(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, oauthProviderUsernameAttrName);
+                exceptionAttribs.put(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, oauthProviderUsername);
+
+                throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME, exceptionAttribs, message);
             }
         }
     }

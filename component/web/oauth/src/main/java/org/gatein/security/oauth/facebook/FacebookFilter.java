@@ -36,14 +36,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.UserProfile;
-import org.exoplatform.services.organization.UserProfileHandler;
+import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.data.OAuthDataStorage;
-import org.gatein.security.oauth.utils.GateInOAuthException;
+import org.gatein.common.exception.GateInException;
 import org.gatein.security.oauth.utils.OAuthConstants;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
@@ -197,7 +195,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
         User portalUser = oauthDataStorage.findUserByFacebookUsername(principal.getUsername());
         if (portalUser == null) {
             // TODO: Here we need to start registration flow
-            throw new GateInOAuthException(OAuthConstants.ERROR_CODE_UNSPECIFIED, "TODO: There is not portalUser corresponding to facebookPrincipal: " + principal);
+            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_UNSPECIFIED, null, "TODO: There is not portalUser corresponding to facebookPrincipal: " + principal);
         }
 
         if (log.isTraceEnabled()) {

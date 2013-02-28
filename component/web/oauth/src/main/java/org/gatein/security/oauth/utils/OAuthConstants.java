@@ -67,20 +67,4 @@ public class OAuthConstants {
 
     public static final String SESSION_ATTRIBUTE_AUTHENTICATED_PRINCIPAL = "authenticatedPrincipal";
 
-
-    // Exception codes
-
-    /**
-     * Unspecified GateIn+OAuth error
-     */
-    public static final int ERROR_CODE_UNSPECIFIED = 0;
-
-    /**
-     * This error could happen during saving of user into GateIn identity database.
-     * It happens when there is an attempt to save user with facebookUsername, but there is already an existing user with same facebookUsername.
-     * For example: We want to save user 'john' with facebookUsername 'john.doyle' but we already have user 'johny2' with same facebookUsername 'john.doyle'
-     */
-    public static final int ERROR_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME = 10;
-
-
 }
