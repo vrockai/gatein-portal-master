@@ -241,7 +241,7 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         } catch (GateInException gtnOauthException) {
             // Show warning message if user with this facebookUsername (or googleUsername) already exists
             if (gtnOauthException.getExceptionCode() == GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
-                Object[] args = convertOAuthExceptionAttributes(gtnOauthException.getExceptionAttributes());
+                Object[] args = convertOAuthExceptionAttributes(context, "UIUserInfo.label.", gtnOauthException.getExceptionAttributes());
                 ApplicationMessage appMessage = new ApplicationMessage("UIUserProfileInputSet.msg.oauth-username-exists", args, ApplicationMessage.WARNING);
                 appMessage.setArgsLocalized(false);
                 uiApp.addMessage(appMessage);
@@ -286,12 +286,12 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         }
     }
 
-    private Object[] convertOAuthExceptionAttributes(Map<String, Object> exceptionAttribs) {
+    public static Object[] convertOAuthExceptionAttributes(WebuiRequestContext context, String messageKeyPrefix, Map<String, Object> exceptionAttribs) {
         String oauthProviderUsernameAttrName = (String)exceptionAttribs.get(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME);
-        ResourceBundle resBundle = WebuiRequestContext.getCurrentInstance().getApplicationResourceBundle();
+        ResourceBundle resBundle = context.getApplicationResourceBundle();
         String localizedOAuthProviderUsernameAttrName;
         try {
-            localizedOAuthProviderUsernameAttrName = resBundle.getString("UIUserInfo.label." + oauthProviderUsernameAttrName);
+            localizedOAuthProviderUsernameAttrName = resBundle.getString(messageKeyPrefix + oauthProviderUsernameAttrName);
         } catch (MissingResourceException mre) {
             localizedOAuthProviderUsernameAttrName = oauthProviderUsernameAttrName;
         }
