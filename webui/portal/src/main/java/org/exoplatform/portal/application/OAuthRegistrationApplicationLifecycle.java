@@ -23,9 +23,7 @@
 
 package org.exoplatform.portal.application;
 
-import org.exoplatform.portal.account.UIAccountProfiles;
-
-import org.exoplatform.portal.account.UIAccountSetting;
+import org.exoplatform.portal.webui.register.UIRegisterOAuth;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
@@ -39,10 +37,10 @@ import org.gatein.common.logging.LoggerFactory;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OAuthApplicationLifecycle implements ApplicationLifecycle<PortalRequestContext> {
+public class OAuthRegistrationApplicationLifecycle implements ApplicationLifecycle<PortalRequestContext> {
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(OAuthApplicationLifecycle.class);
+    private final Logger log = LoggerFactory.getLogger(OAuthRegistrationApplicationLifecycle.class);
 
     public void onInit(Application app) throws Exception {
     }
@@ -52,8 +50,7 @@ public class OAuthApplicationLifecycle implements ApplicationLifecycle<PortalReq
             System.out.println("Facebook register is here!!!! Starting to process");
             UIPortalApplication uiApp = Util.getUIPortalApplication();
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
-            //Class<? extends UIComponent> clazz = (Class<? extends UIComponent>)Class.forName("org.exoplatform.account.webui.component.UIRegisterPortlet");
-            UIComponent uiLogin = uiMaskWS.createUIComponent(UIAccountSetting.class, null, null);
+            UIComponent uiLogin = uiMaskWS.createUIComponent(UIRegisterOAuth.class, null, null);
             uiMaskWS.setUIComponent(uiLogin);
             Util.getPortalRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
         }
