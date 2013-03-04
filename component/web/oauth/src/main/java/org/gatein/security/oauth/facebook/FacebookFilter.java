@@ -37,11 +37,11 @@ import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.organization.User;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.exoplatform.services.organization.impl.UserImpl;
+import org.exoplatform.web.security.AuthenticationRegistry;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.data.OAuthDataStorage;
-import org.gatein.common.exception.GateInException;
 import org.gatein.security.oauth.utils.OAuthConstants;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
@@ -58,10 +58,6 @@ public class FacebookFilter extends AbstractSSOInterceptor {
 
     private static Logger log = LoggerFactory.getLogger(FacebookFilter.class);
 
-    // URL to redirect after finish whole Facebook authentication process
-    private String loginUrl;
-    private boolean attachUsernamePasswordToLoginURL;
-
     // URL to redirect from Facebook during authentication process
     private String redirectURL;
 
@@ -70,12 +66,10 @@ public class FacebookFilter extends AbstractSSOInterceptor {
     private String scope;
     private FacebookProcessor facebookProcessor;
 
-    private OAuthDataStorage oauthDataStorage;
+    private AuthenticationRegistry authenticationRegistry;
 
     @Override
     protected void initImpl() {
-        this.loginUrl = getInitParameter("loginUrl");
-
         this.appid = getInitParameter("appid");
         this.appsecret = getInitParameter("appsecret");
         this.scope = getInitParameter("scope");
@@ -99,12 +93,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
             redirectURL = "http://localhost:8080/" + PortalContainer.getInstance().getName() + "/facebookAuth";
         }
 
-        String attachUsernamePasswordToLoginURLConfig = getInitParameter("attachUsernamePasswordToLoginURL");
-        this.attachUsernamePasswordToLoginURL = attachUsernamePasswordToLoginURLConfig == null ? true : Boolean.parseBoolean(attachUsernamePasswordToLoginURLConfig);
-
-        log.info("FacebookFilter configuration: loginURL=" + loginUrl +
-                ", attachUsernamePasswordToLoginURL=" + this.attachUsernamePasswordToLoginURL +
-                ", appid=" + this.appid +
+        log.info("FacebookFilter configuration: appid=" + this.appid +
                 ", appsecret=" + this.appsecret +
                 ", scope=" + this.scope +
                 ", redirectURL=" + this.redirectURL);
@@ -112,7 +101,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
         // Use empty rolesList because we don't need rolesList for GateIn integration
         facebookProcessor = new FacebookProcessor(appid, appsecret, scope, redirectURL, Arrays.asList(new String[]{}));
 
-        oauthDataStorage = (OAuthDataStorage)getExoContainer().getComponentInstanceOfType(OAuthDataStorage.class);
+        authenticationRegistry = (AuthenticationRegistry)getExoContainer().getComponentInstanceOfType(AuthenticationRegistry.class);
     }
 
     @Override
@@ -150,15 +139,6 @@ public class FacebookFilter extends AbstractSSOInterceptor {
             log.trace("state=" + state);
         }
 
-        if (FacebookProcessor.STATES.FINISH.name().equals(state)) {
-            Principal principal = (Principal)httpRequest.getSession().getAttribute(OAuthConstants.SESSION_ATTRIBUTE_AUTHENTICATED_PRINCIPAL);
-            if (principal == null) {
-                log.error("Principal was null. Maybe login modules need to be configured properly.");
-            }
-            processPrincipal(httpRequest, httpResponse, (FacebookPrincipal)principal);
-            return;
-        }
-
         // Very initial request to portal
         if (state == null || state.isEmpty()) {
             facebookProcessor.initialInteraction(httpRequest, httpResponse);
@@ -171,75 +151,24 @@ public class FacebookFilter extends AbstractSSOInterceptor {
             return;
         }
 
-
         // Finish OAuth handshake
         if (state.equals(FacebookProcessor.STATES.AUTHZ.name())) {
-            Principal principal = facebookProcessor.getPrincipal(httpRequest, httpResponse);
+            FacebookPrincipal principal = (FacebookPrincipal)facebookProcessor.getPrincipal(httpRequest, httpResponse);
 
             if (principal == null) {
                 log.error("Principal was null. Maybe login modules need to be configured properly.");
             } else {
                 httpRequest.getSession().setAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE, FacebookProcessor.STATES.FINISH.name());
-                httpRequest.getSession().setAttribute(OAuthConstants.SESSION_ATTRIBUTE_AUTHENTICATED_PRINCIPAL, principal);
-                processPrincipal(httpRequest, httpResponse, (FacebookPrincipal)principal);
+
+                if (log.isTraceEnabled()) {
+                    log.trace("Obtained principal from Facebook authentication: " + principal);
+                    log.trace("Facebook accessToken: " + principal.getAccessToken());
+                }
+                authenticationRegistry.setAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL, principal);
+
+                // Continue with request
+                chain.doFilter(request, response);
             }
         }
-    }
-
-    protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FacebookPrincipal principal) throws IOException {
-        if (log.isTraceEnabled()) {
-            log.trace("Obtained principal from Facebook authentication: " + principal);
-            log.trace("Facebook accessToken: " + principal.getAccessToken());
-        }
-
-        User portalUser = oauthDataStorage.findUserByFacebookUsername(principal.getUsername());
-        if (portalUser == null) {
-            // TODO: Here we need to start registration flow
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_UNSPECIFIED, null, "TODO: There is not portalUser corresponding to facebookPrincipal: " + principal);
-        }
-
-        if (log.isTraceEnabled()) {
-            log.trace("Found portalUser " + portalUser + " corresponding to facebookPrincipal with username " + principal.getUsername());
-        }
-
-        // TODO: Refactor this by made the method saveSSOCredentials public instead of protected
-        new GenericAgent() {
-
-            @Override
-            public void saveSSOCredentials(String username, HttpServletRequest httpRequest) {
-                super.saveSSOCredentials(username, httpRequest);
-            }
-
-        }.saveSSOCredentials(portalUser.getUserName(), httpRequest);
-
-        oauthDataStorage.saveFacebookAccessToken(portalUser.getUserName(), principal.getAccessToken());
-
-        // Now Facebook authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
-        String loginRedirectURL = httpResponse.encodeRedirectURL(getLoginRedirectUrl(httpRequest));
-        httpResponse.sendRedirect(loginRedirectURL);
-    }
-
-    // Forked from InitiateLoginFilter
-    protected String getLoginRedirectUrl(HttpServletRequest req) {
-        StringBuilder url = new StringBuilder(this.loginUrl);
-
-        if (attachUsernamePasswordToLoginURL) {
-            String fakePassword = req.getSession().getId() + "_" + String.valueOf(System.currentTimeMillis());
-
-            // Try to use username from authenticated credentials
-            String username;
-            Credentials creds = (Credentials)req.getSession().getAttribute(GenericAgent.AUTHENTICATED_CREDENTIALS);
-            if (creds != null) {
-                username = creds.getUsername();
-            } else {
-                // Fallback to fakePassword, but this should't happen (credentials should always be available when this method is called)
-                username = fakePassword;
-            }
-
-            // Use sessionId and system millis as password (similar like spnego is doing)
-            url.append("?username=").append(username).append("&password=").append(fakePassword);
-        }
-
-        return url.toString();
     }
 }

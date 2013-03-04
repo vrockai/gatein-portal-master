@@ -63,8 +63,10 @@ public class OAuthConstants {
     public static final String PROFILE_GOOGLE_ACCESS_TOKEN = "user.social-info.google.accessToken";
 
 
-    // Session attributes
+    // Session (or AuthenticationRegistry) attributes
 
-    public static final String SESSION_ATTRIBUTE_AUTHENTICATED_PRINCIPAL = "authenticatedPrincipal";
+    public static final String ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL = "_authenticatedOAuthPrincipal";
+
+    public static final String ATTRIBUTE_AUTHENTICATED_PORTAL_USER = "_authenticatedPortalUser";
 
 }

@@ -27,27 +27,43 @@ import org.exoplatform.portal.webui.register.UIRegisterOAuth;
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
 import org.exoplatform.portal.webui.workspace.UIPortalApplication;
+import org.exoplatform.services.organization.User;
 import org.exoplatform.web.application.Application;
 import org.exoplatform.web.application.ApplicationLifecycle;
 import org.exoplatform.web.application.RequestFailure;
+import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.webui.core.UIComponent;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.utils.OAuthConstants;
 
 /**
+ * Lifecycle which is used to display Registration form after successful OAuth authentication. It's used only if user, which was
+ * authenticated through OAuth2 doesn't exist in portal
+ *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OAuthRegistrationApplicationLifecycle implements ApplicationLifecycle<PortalRequestContext> {
+public class OAuthRegistrationLifecycle implements ApplicationLifecycle<PortalRequestContext> {
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(OAuthRegistrationApplicationLifecycle.class);
+    private final Logger log = LoggerFactory.getLogger(OAuthRegistrationLifecycle.class);
+
+    private AuthenticationRegistry authRegistry;
 
     public void onInit(Application app) throws Exception {
+        this.authRegistry = (AuthenticationRegistry)app.getApplicationServiceContainer().getComponentInstanceOfType(AuthenticationRegistry.class);
     }
 
     public void onStartRequest(Application app, PortalRequestContext context) throws Exception {
-        if (context.getRequestURI().contains("/facebookRegister")) {
-            System.out.println("Facebook register is here!!!! Starting to process");
+        User oauthAuthenticatedUser = (User)authRegistry.getAttributeOfClient(context.getRequest(), OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
+
+        if (oauthAuthenticatedUser != null) {
+
+            if (log.isTraceEnabled()) {
+                log.trace("Found user, which has been authenticated through OAuth. Username is " + oauthAuthenticatedUser.getUserName() +
+                        ". Will redirect to registration form");
+            }
+
             UIPortalApplication uiApp = Util.getUIPortalApplication();
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
             UIComponent uiLogin = uiMaskWS.createUIComponent(UIRegisterOAuth.class, null, null);

@@ -81,11 +81,6 @@
           <name>filterMapping</name>
           <value>/facebookAuth</value>
         </value-param>
-        <!-- URL to redirect after finish whole Facebook authentication process -->
-        <value-param>
-          <name>loginUrl</name>
-          <value>/@@portal.container.name@@/dologin</value>
-        </value-param>
         <value-param>
           <name>appid</name>
           <value>${gatein.oauth.facebook.appid}</value>
@@ -102,6 +97,39 @@
         <value-param>
           <name>scope</name>
           <value>${gatein.oauth.facebook.scope}</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.gatein.sso.integration.SSOFilterIntegrator</target-component>
+    <component-plugin>
+      <name>OAuthIntegrationFilter</name>
+      <set-method>addPlugin</set-method>
+      <type>org.gatein.sso.integration.SSOFilterIntegratorPlugin</type>
+      <init-params>
+        <value-param>
+          <name>filterClass</name>
+          <value>org.gatein.security.oauth.facebook.OAuthIntegrationFilter</value>
+        </value-param>
+        <value-param>
+          <name>enabled</name>
+          <value>${gatein.oauth.facebook.enabled:true}</value>
+        </value-param>
+        <value-param>
+          <name>filterMapping</name>
+          <value>/*</value>
+        </value-param>
+        <!-- URL to redirect after finish OAuth authentication process. It's used if registration of new GateIn user is needed -->
+        <value-param>
+          <name>registrationUrl</name>
+          <value>/@@portal.container.name@@/</value>
+        </value-param>
+        <!-- URL to redirect after finish OAuth authentication process. It's used if registration of new GateIn user is not needed because user is already registered -->
+        <value-param>
+          <name>loginUrl</name>
+          <value>/@@portal.container.name@@/dologin</value>
         </value-param>
       </init-params>
     </component-plugin>
