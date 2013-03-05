@@ -30,6 +30,8 @@ import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.web.application.Application;
 import org.exoplatform.web.application.ApplicationLifecycle;
+import org.exoplatform.web.application.ApplicationRequestPhaseLifecycle;
+import org.exoplatform.web.application.Phase;
 import org.exoplatform.web.application.RequestFailure;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.webui.core.UIComponent;
@@ -50,10 +52,12 @@ public class OAuthRegistrationLifecycle implements ApplicationLifecycle<PortalRe
 
     private AuthenticationRegistry authRegistry;
 
+    @Override
     public void onInit(Application app) throws Exception {
         this.authRegistry = (AuthenticationRegistry)app.getApplicationServiceContainer().getComponentInstanceOfType(AuthenticationRegistry.class);
     }
 
+    @Override
     public void onStartRequest(Application app, PortalRequestContext context) throws Exception {
         User oauthAuthenticatedUser = (User)authRegistry.getAttributeOfClient(context.getRequest(), OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
 
@@ -66,18 +70,24 @@ public class OAuthRegistrationLifecycle implements ApplicationLifecycle<PortalRe
 
             UIPortalApplication uiApp = Util.getUIPortalApplication();
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
-            UIComponent uiLogin = uiMaskWS.createUIComponent(UIRegisterOAuth.class, null, null);
-            uiMaskWS.setUIComponent(uiLogin);
-            Util.getPortalRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
+
+            if (!uiMaskWS.isShow() || !uiMaskWS.getUIComponent().getClass().equals(UIRegisterOAuth.class)) {
+                UIComponent uiLogin = uiMaskWS.createUIComponent(UIRegisterOAuth.class, null, null);
+                uiMaskWS.setUIComponent(uiLogin);
+                Util.getPortalRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
+            }
         }
     }
 
+    @Override
     public void onFailRequest(Application app, PortalRequestContext context, RequestFailure failureType) {
     }
 
+    @Override
     public void onEndRequest(Application app, PortalRequestContext context) throws Exception {
     }
 
+    @Override
     public void onDestroy(Application app) throws Exception {
     }
 }
