@@ -97,7 +97,7 @@ public class UIRegisterOAuth extends UIContainer {
         uiRegisterInputSet.getUIStringInput(UIRegisterInputSet.EMAIL_ADDRESS).setValue(portalUser.getEmail());
         uiRegisterInputSet.getUIStringInput(UIRegisterInputSet.PASSWORD).setValue(null);
         uiRegisterInputSet.getUIStringInput(UIRegisterInputSet.CONFIRM_PASSWORD).setValue(null);
-        uiRegisterInputSet.getUIStringInput(UIRegisterInputSet.DISPLAY_NAME).setValue(null);
+        uiRegisterInputSet.getUIStringInput(UIRegisterInputSet.DISPLAY_NAME).setValue(portalUser.getDisplayName());
     }
 
     public static class ResetActionListener extends EventListener<UIRegisterForm> {

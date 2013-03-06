@@ -196,6 +196,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
         gateinUser.setFirstName(principal.getFirstName());
         gateinUser.setLastName(principal.getLastName());
         gateinUser.setEmail(principal.getEmail());
+        gateinUser.setDisplayName(principal.getAttribute("name"));
         return gateinUser;
     }
 }

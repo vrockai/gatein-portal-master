@@ -84,7 +84,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
         }
 
         if (redirectURL == null || redirectURL.length() == 0) {
-            redirectURL = "http://localhost:8080/" + PortalContainer.getInstance().getName() + "/facebookAuth";
+            redirectURL = "http://localhost:8080/" + getExoContainer().getContext().getName() + "/facebookAuth";
         }
 
         log.info("FacebookFilter configuration: appid=" + this.appid +
