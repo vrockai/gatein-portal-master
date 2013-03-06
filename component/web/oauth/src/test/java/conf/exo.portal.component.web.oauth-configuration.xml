@@ -26,8 +26,8 @@
                xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.gatein.security.oauth.data.OAuthDataStorage</key>
-    <type>org.gatein.security.oauth.data.OAuthDataStorageImpl</type>
+    <key>org.gatein.security.oauth.data.SocialNetworkService</key>
+    <type>org.gatein.security.oauth.data.SocialNetworkServiceImpl</type>
   </component>
 
   <external-component-plugins>

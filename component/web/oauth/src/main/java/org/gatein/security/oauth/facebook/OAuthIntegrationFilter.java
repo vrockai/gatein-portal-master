@@ -39,7 +39,7 @@ import org.exoplatform.services.organization.impl.UserImpl;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.gatein.security.oauth.data.OAuthDataStorage;
+import org.gatein.security.oauth.data.SocialNetworkService;
 import org.gatein.security.oauth.utils.OAuthConstants;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
@@ -61,7 +61,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
     private String registrationUrl;
     private boolean attachUsernamePasswordToLoginURL;
 
-    private OAuthDataStorage oauthDataStorage;
+    private SocialNetworkService socialNetworkService;
     private AuthenticationRegistry authenticationRegistry;
 
     @Override
@@ -79,7 +79,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
                 ", registrationUrl=" + this.registrationUrl +
                 ", attachUsernamePasswordToLoginURL=" + this.attachUsernamePasswordToLoginURL);
 
-        oauthDataStorage = (OAuthDataStorage)getExoContainer().getComponentInstanceOfType(OAuthDataStorage.class);
+        socialNetworkService = (SocialNetworkService)getExoContainer().getComponentInstanceOfType(SocialNetworkService.class);
         authenticationRegistry = (AuthenticationRegistry)getExoContainer().getComponentInstanceOfType(AuthenticationRegistry.class);
     }
 
@@ -117,7 +117,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
 
 
     protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FacebookPrincipal principal) throws IOException {
-        User portalUser = oauthDataStorage.findUserByFacebookUsername(principal.getUsername());
+        User portalUser = socialNetworkService.findUserByFacebookUsername(principal.getUsername());
 
         if (portalUser == null) {
             // This means that user has been successfully authenticated via OAuth, but doesn't exist in GateIn. So we need to establish context
@@ -162,7 +162,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
 
         }.saveSSOCredentials(portalUser.getUserName(), httpRequest);
 
-        oauthDataStorage.saveFacebookAccessToken(portalUser.getUserName(), accessToken);
+        socialNetworkService.saveFacebookAccessToken(portalUser.getUserName(), accessToken);
 
         // Now Facebook authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
         String loginRedirectURL = httpResponse.encodeRedirectURL(getLoginRedirectUrl(httpRequest, portalUser.getUserName()));

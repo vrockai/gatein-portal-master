@@ -28,7 +28,7 @@ import org.exoplatform.services.organization.User;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public interface OAuthDataStorage {
+public interface SocialNetworkService {
 
     User findUserByFacebookUsername(String facebookUsername);
 

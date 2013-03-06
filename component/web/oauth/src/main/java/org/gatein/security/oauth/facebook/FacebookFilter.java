@@ -24,7 +24,6 @@
 package org.gatein.security.oauth.facebook;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Arrays;
 
 import javax.servlet.FilterChain;
@@ -36,16 +35,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.impl.UserImpl;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.gatein.security.oauth.data.OAuthDataStorage;
 import org.gatein.security.oauth.utils.OAuthConstants;
-import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
-import org.gatein.wci.security.Credentials;
 import org.picketlink.social.standalone.fb.FacebookPrincipal;
 import org.picketlink.social.standalone.fb.FacebookProcessor;
 

@@ -40,11 +40,11 @@ import org.gatein.common.exception.GateInExceptionConstants;
 public class UniqueOAuthProviderUsernameListener extends UserProfileEventListener {
 
     private final List<String> oauthProviderUsernameAttrNames;
-    private final OAuthDataStorage oauthDataStorage;
+    private final SocialNetworkService socialNetworkService;
 
-    public UniqueOAuthProviderUsernameListener(InitParams params, OAuthDataStorage oauthDataStorage) {
+    public UniqueOAuthProviderUsernameListener(InitParams params, SocialNetworkService socialNetworkService) {
         oauthProviderUsernameAttrNames  = params.getValuesParam("oauthProviderUsernameAttrNames").getValues();
-        this.oauthDataStorage = oauthDataStorage;
+        this.socialNetworkService = socialNetworkService;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UniqueOAuthProviderUsernameListener extends UserProfileEventListene
                 continue;
             }
 
-            User foundUser = oauthDataStorage.findUserByOAuthProviderUsername(oauthProviderUsernameAttrName, oauthProviderUsername);
+            User foundUser = socialNetworkService.findUserByOAuthProviderUsername(oauthProviderUsernameAttrName, oauthProviderUsername);
             if (foundUser != null && !user.getUserName().equals(foundUser.getUserName())) {
                 String message = "Attempt to save " + oauthProviderUsernameAttrName + " with value " + oauthProviderUsername +
                         " but it already exists. currentUser=" + user.getUserName() + ", userWithThisOAuthUsername=" + foundUser.getUserName();

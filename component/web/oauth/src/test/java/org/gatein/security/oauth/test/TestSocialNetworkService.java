@@ -35,7 +35,7 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.impl.UserImpl;
 import org.gatein.common.exception.GateInExceptionConstants;
-import org.gatein.security.oauth.data.OAuthDataStorage;
+import org.gatein.security.oauth.data.SocialNetworkService;
 import org.gatein.common.exception.GateInException;
 import org.gatein.security.oauth.utils.OAuthConstants;
 
@@ -45,16 +45,16 @@ import org.gatein.security.oauth.utils.OAuthConstants;
 @ConfiguredBy({
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.identity-configuration.xml"),
         @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.portal.component.web.oauth-configuration.xml") })
-public class TestOAuthDataStorage extends AbstractKernelTest {
+public class TestSocialNetworkService extends AbstractKernelTest {
 
     private OrganizationService orgService;
-    private OAuthDataStorage oauthDataStorage;
+    private SocialNetworkService socialNetworkService;
 
     @Override
     protected void setUp() throws Exception {
         PortalContainer portalContainer = PortalContainer.getInstance();
         orgService = (OrganizationService) portalContainer.getComponentInstanceOfType(OrganizationService.class);
-        oauthDataStorage = (OAuthDataStorage) portalContainer.getComponentInstanceOfType(OAuthDataStorage.class);
+        socialNetworkService = (SocialNetworkService) portalContainer.getComponentInstanceOfType(SocialNetworkService.class);
         begin();
     }
 
@@ -82,15 +82,15 @@ public class TestOAuthDataStorage extends AbstractKernelTest {
         orgService.getUserProfileHandler().saveUserProfile(userProfile2, true);
 
         // Find user by facebook and google username
-        User foundUser = oauthDataStorage.findUserByFacebookUsername("joseph.doyle");
+        User foundUser = socialNetworkService.findUserByFacebookUsername("joseph.doyle");
         assertNotNull(foundUser);
         assertEquals(foundUser.getUserName(), user1.getUserName());
 
-        User foundUser2 = oauthDataStorage.findUserByFacebookUsername("john.doyle");
+        User foundUser2 = socialNetworkService.findUserByFacebookUsername("john.doyle");
         assertNotNull(foundUser2);
         assertEquals(foundUser2.getUserName(), user2.getUserName());
 
-        User foundUser3 = oauthDataStorage.findUserByGoogleUsername("john.something");
+        User foundUser3 = socialNetworkService.findUserByGoogleUsername("john.something");
         assertNotNull(foundUser3);
         assertEquals(foundUser3.getUserName(), user2.getUserName());
 
@@ -119,14 +119,14 @@ public class TestOAuthDataStorage extends AbstractKernelTest {
         orgService.getUserHandler().createUser(user1, false);
         orgService.getUserHandler().createUser(user2, false);
 
-        oauthDataStorage.saveFacebookAccessToken(user1.getUserName(), "aaa123");
-        oauthDataStorage.saveFacebookAccessToken(user2.getUserName(), "bbb456");
-        oauthDataStorage.saveGoogleAccessToken(user1.getUserName(), "ccc789");
+        socialNetworkService.saveFacebookAccessToken(user1.getUserName(), "aaa123");
+        socialNetworkService.saveFacebookAccessToken(user2.getUserName(), "bbb456");
+        socialNetworkService.saveGoogleAccessToken(user1.getUserName(), "ccc789");
 
-        assertEquals("aaa123", oauthDataStorage.getFacebookAccessToken(user1.getUserName()));
-        assertEquals("bbb456", oauthDataStorage.getFacebookAccessToken(user2.getUserName()));
-        assertEquals("ccc789", oauthDataStorage.getGoogleAccessToken(user1.getUserName()));
-        assertNull(oauthDataStorage.getGoogleAccessToken(user2.getUserName()));
+        assertEquals("aaa123", socialNetworkService.getFacebookAccessToken(user1.getUserName()));
+        assertEquals("bbb456", socialNetworkService.getFacebookAccessToken(user2.getUserName()));
+        assertEquals("ccc789", socialNetworkService.getGoogleAccessToken(user1.getUserName()));
+        assertNull(socialNetworkService.getGoogleAccessToken(user2.getUserName()));
 
         // TODO: Verify that accessTokens are encoded by directly access them through userProfiles
     }

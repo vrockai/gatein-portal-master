@@ -37,13 +37,13 @@ import org.gatein.security.oauth.utils.OAuthConstants;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OAuthDataStorageImpl implements OAuthDataStorage {
+public class SocialNetworkServiceImpl implements SocialNetworkService {
 
-    private static Logger log = LoggerFactory.getLogger(OAuthDataStorageImpl.class);
+    private static Logger log = LoggerFactory.getLogger(SocialNetworkServiceImpl.class);
 
     private OrganizationService orgService;
 
-    public OAuthDataStorageImpl(OrganizationService orgService) {
+    public SocialNetworkServiceImpl(OrganizationService orgService) {
         this.orgService = orgService;
     }
 
