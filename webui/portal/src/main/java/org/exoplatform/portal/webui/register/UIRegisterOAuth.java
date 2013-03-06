@@ -63,14 +63,14 @@ public class UIRegisterOAuth extends UIContainer {
 
     private static Logger log = LoggerFactory.getLogger(UIRegisterOAuth.class);
 
-    private static final String[] ACTIONS = { "Subscribe", "Reset", "Cancel" };
+    private static final String[] ACTIONS = { "SubscribeOAuth", "Reset", "Cancel" };
 
     static final String REGISTER_FORM_CONFIG_ID = "UIRegisterFormOAuth";
 
     private final User portalUser;
 
     public UIRegisterOAuth() throws Exception {
-        addChild(UIRegisterForm.class, REGISTER_FORM_CONFIG_ID, null);
+        addChild(UIRegisterForm.class, REGISTER_FORM_CONFIG_ID, "UIRegisterForm");
 
         UIRegisterForm uiRegisterForm = getChild(UIRegisterForm.class);
         uiRegisterForm.setActions(ACTIONS);
@@ -131,7 +131,7 @@ public class UIRegisterOAuth extends UIContainer {
         }
     }
 
-    public static class SubscribeActionListener extends UIRegisterForm.SubscribeActionListener {
+    public static class SubscribeOAuthActionListener extends UIRegisterForm.SubscribeActionListener {
 
         @Override
         public void execute(Event<UIRegisterForm> event) throws Exception {
