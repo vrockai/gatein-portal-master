@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -147,7 +146,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
 
         // Finish OAuth handshake
         if (state.equals(FacebookProcessor.STATES.AUTHZ.name())) {
-            FacebookPrincipal principal = (FacebookPrincipal)facebookProcessor.getPrincipal(httpRequest, httpResponse);
+            FacebookPrincipal principal = (FacebookPrincipal)facebookProcessor.handleAuthenticationResponse(httpRequest, httpResponse);
 
             if (principal == null) {
                 log.error("Principal was null. Maybe login modules need to be configured properly.");
