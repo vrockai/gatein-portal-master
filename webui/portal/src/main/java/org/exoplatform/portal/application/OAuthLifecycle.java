@@ -52,10 +52,10 @@ import org.gatein.security.oauth.utils.OAuthConstants;
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OAuthRegistrationLifecycle implements ApplicationLifecycle<PortalRequestContext> {
+public class OAuthLifecycle implements ApplicationLifecycle<PortalRequestContext> {
 
     /** . */
-    private final Logger log = LoggerFactory.getLogger(OAuthRegistrationLifecycle.class);
+    private final Logger log = LoggerFactory.getLogger(OAuthLifecycle.class);
 
     private AuthenticationRegistry authRegistry;
 
