@@ -31,7 +31,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.gatein.common.exception.GateInException;
+import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.data.SocialNetworkService;
@@ -60,6 +63,7 @@ public class OAuthLinkAccountFilter extends AbstractSSOInterceptor {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpServletResponse httpResponse = (HttpServletResponse)response;
+        HttpSession session = httpRequest.getSession();
 
         // Do nothing for anonymous user
         if (httpRequest.getRemoteUser() == null) {
@@ -74,14 +78,27 @@ public class OAuthLinkAccountFilter extends AbstractSSOInterceptor {
             return;
         }
 
-        socialNetworkService.updateOAuthInfo(oauthPrincipal.getOauthProviderType(), httpRequest.getRemoteUser(),
-                oauthPrincipal.getUserName(), oauthPrincipal.getAccessToken());
+        try {
+            socialNetworkService.updateOAuthInfo(oauthPrincipal.getOauthProviderType(), httpRequest.getRemoteUser(),
+                    oauthPrincipal.getUserName(), oauthPrincipal.getAccessToken());
 
-        String urlToRedirect = (String)httpRequest.getSession().getAttribute(OAuthConstants.ATTRIBUTE_URL_TO_REDIRECT_AFTER_LINK_SOCIAL_ACCOUNT);
+            // Add some attribute to session, which will be read by OAuthLifecycle
+            session.setAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER_USERNAME_ATTR_NAME, oauthPrincipal.getOauthProviderType().getUserNameAttrName());
+        } catch (GateInException gtnOauthException) {
+            // Show warning message if user with this facebookUsername (or googleUsername) already exists
+            if (gtnOauthException.getExceptionCode() == GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
+                // Add some attribute to session, which will be read by OAuthLifecycle
+                session.setAttribute(OAuthConstants.ATTRIBUTE_EXCEPTION_AFTER_FAILED_LINK, gtnOauthException);
+            } else {
+                throw gtnOauthException;
+            }
+        }
+
+        String urlToRedirect = (String)session.getAttribute(OAuthConstants.ATTRIBUTE_URL_TO_REDIRECT_AFTER_LINK_SOCIAL_ACCOUNT);
         if (urlToRedirect == null) {
             urlToRedirect = httpRequest.getContextPath();
         } else {
-            httpRequest.getSession().removeAttribute(OAuthConstants.ATTRIBUTE_URL_TO_REDIRECT_AFTER_LINK_SOCIAL_ACCOUNT);
+            session.removeAttribute(OAuthConstants.ATTRIBUTE_URL_TO_REDIRECT_AFTER_LINK_SOCIAL_ACCOUNT);
         }
 
 

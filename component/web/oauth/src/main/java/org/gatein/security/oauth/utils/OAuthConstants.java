@@ -73,6 +73,10 @@ public class OAuthConstants {
 
     public static final String ATTRIBUTE_SOCIAL_NETWORK_PROVIDER_TO_UNLINK = "_socialNetworkProviderToUnlink";
 
+    public static final String ATTRIBUTE_LINKED_OAUTH_PROVIDER_USERNAME_ATTR_NAME = "_linkedOAuthProviderUsernameAttrName";
+
+    public static final String ATTRIBUTE_EXCEPTION_AFTER_FAILED_LINK = "_oauthExceptionAfterFailedLink";
+
     // URL
 
     public static final String FACEBOOK_AUTHENTICATION_URL_PATH = "/facebookAuth";

@@ -167,13 +167,9 @@ public class UIRegisterOAuth extends UIContainer {
                         // Drop new user
                         orgService.getUserHandler().removeUser(newUser.getUserName(), true);
 
-                        Object[] args = UIUserProfileInputSet.convertOAuthExceptionAttributes(portalRequestContext, "UIAccountSocial.label.", gtnOauthException.getExceptionAttributes());
-                        ApplicationMessage appMessage = new ApplicationMessage("UIUserProfileInputSet.msg.oauth-username-exists", args, ApplicationMessage.WARNING);
-                        appMessage.setArgsLocalized(false);
-
                         // Clear previous message about successful creation of user because we dropped him. Add message about duplicate oauth username
                         uiApp.clearMessages();
-                        uiApp.addMessage(appMessage);
+                        UIUserProfileInputSet.addOAuthExceptionMessage(context, gtnOauthException, uiApp);
                         return;
                     } else {
                         throw gtnOauthException;
