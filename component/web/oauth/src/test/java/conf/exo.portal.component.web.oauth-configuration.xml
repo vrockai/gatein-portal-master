@@ -36,13 +36,6 @@
       <name>UniqueOAuthProviderUsernameListener</name>
       <set-method>addListenerPlugin</set-method>
       <type>org.gatein.security.oauth.data.UniqueOAuthProviderUsernameListener</type>
-      <init-params>
-        <values-param>
-          <name>oauthProviderUsernameAttrNames</name>
-          <value>user.social-info.facebook.userName</value>
-          <value>user.social-info.google.userName</value>
-        </values-param>
-      </init-params>
     </component-plugin>
   </external-component-plugins>
 

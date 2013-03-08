@@ -41,6 +41,7 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.data.SocialNetworkService;
 import org.gatein.security.oauth.utils.OAuthConstants;
+import org.gatein.security.oauth.utils.OAuthProviderType;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
 import org.picketlink.social.standalone.fb.FacebookPrincipal;
@@ -117,7 +118,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
 
 
     protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FacebookPrincipal principal) throws IOException {
-        User portalUser = socialNetworkService.findUserByFacebookUsername(principal.getUsername());
+        User portalUser = socialNetworkService.findUserByOAuthProviderUsername(OAuthProviderType.FACEBOOK, principal.getUsername());
 
         if (portalUser == null) {
             // This means that user has been successfully authenticated via OAuth, but doesn't exist in GateIn. So we need to establish context
@@ -162,7 +163,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
 
         }.saveSSOCredentials(portalUser.getUserName(), httpRequest);
 
-        socialNetworkService.saveFacebookAccessToken(portalUser.getUserName(), accessToken);
+        socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, portalUser.getUserName(), accessToken);
 
         // Now Facebook authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
         String loginRedirectURL = httpResponse.encodeRedirectURL(getLoginRedirectUrl(httpRequest, portalUser.getUserName()));
