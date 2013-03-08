@@ -21,22 +21,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.data;
+package org.gatein.security.oauth.facebook;
 
-import org.exoplatform.services.organization.User;
-import org.gatein.security.oauth.generic.OAuthProviderType;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.picketlink.social.standalone.fb.FacebookPrincipal;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public interface SocialNetworkService {
+public interface GateInFacebookProcessor {
 
-    User findUserByOAuthProviderUsername(OAuthProviderType oauthProviderType, String oauthProviderUsername);
+    void initialInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException;
 
-    void updateOAuthAccessToken(OAuthProviderType oauthProviderType, String username, String accessToken);
+    void handleAuthStage(HttpServletRequest httpRequest, HttpServletResponse httpResponse);
 
-    String getOAuthAccessToken(OAuthProviderType oauthProviderType, String username);
+    FacebookPrincipal getPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse);
 
-    void updateOAuthInfo(OAuthProviderType oauthProviderType, String username, String oauthUsername, String accessToken);
-
+    FacebookInteractionState processFacebookInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException;
 }

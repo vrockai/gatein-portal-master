@@ -21,7 +21,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.utils;
+package org.gatein.security.oauth.generic;
+
+import org.gatein.security.oauth.utils.OAuthConstants;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

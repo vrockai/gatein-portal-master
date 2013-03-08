@@ -120,10 +120,9 @@ public class UIRegisterOAuth extends UIContainer {
             AuthenticationRegistry authRegistry = event.getSource().getApplicationComponent(AuthenticationRegistry.class);
             HttpServletRequest httpRequest = Util.getPortalRequestContext().getRequest();
 
-            // Clear whole context of OAuth login. See OAuthIntegrationFilter.cleanAuthenticationContext
+            // Clear whole context of OAuth login. See OAuthAuthenticationFilter.cleanAuthenticationContext
             authRegistry.removeAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL);
             authRegistry.removeAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
-            httpRequest.getSession().removeAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
 
             if (log.isTraceEnabled()) {
                 log.trace("Registration with OAuth properties terminated. Clearing authentication context");

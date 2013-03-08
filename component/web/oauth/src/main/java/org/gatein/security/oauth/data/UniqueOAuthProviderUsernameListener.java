@@ -24,7 +24,6 @@
 package org.gatein.security.oauth.data;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.container.xml.InitParams;
@@ -33,7 +32,7 @@ import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
-import org.gatein.security.oauth.utils.OAuthProviderType;
+import org.gatein.security.oauth.generic.OAuthProviderType;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

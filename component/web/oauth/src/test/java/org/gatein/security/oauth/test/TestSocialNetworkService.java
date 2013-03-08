@@ -38,7 +38,7 @@ import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.data.SocialNetworkService;
 import org.gatein.common.exception.GateInException;
 import org.gatein.security.oauth.utils.OAuthConstants;
-import org.gatein.security.oauth.utils.OAuthProviderType;
+import org.gatein.security.oauth.generic.OAuthProviderType;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

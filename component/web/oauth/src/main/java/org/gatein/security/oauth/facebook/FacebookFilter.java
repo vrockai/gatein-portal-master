@@ -37,7 +37,9 @@ import javax.servlet.http.HttpSession;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.generic.OAuthPrincipal;
 import org.gatein.security.oauth.utils.OAuthConstants;
+import org.gatein.security.oauth.utils.OAuthUtils;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
 import org.picketlink.social.standalone.fb.FacebookPrincipal;
 import org.picketlink.social.standalone.fb.FacebookProcessor;
@@ -51,113 +53,51 @@ public class FacebookFilter extends AbstractSSOInterceptor {
 
     private static Logger log = LoggerFactory.getLogger(FacebookFilter.class);
 
-    // URL to redirect from Facebook during authentication process
-    private String redirectURL;
-
-    private String appid;
-    private String appsecret;
-    private String scope;
-    private FacebookProcessor facebookProcessor;
-
     private AuthenticationRegistry authenticationRegistry;
+    private GateInFacebookProcessor facebookProcessor;
 
     @Override
     protected void initImpl() {
-        this.appid = getInitParameter("appid");
-        this.appsecret = getInitParameter("appsecret");
-        this.scope = getInitParameter("scope");
-        this.redirectURL = getInitParameter("redirectUrl");
-
-        if (appid == null || appid.length() == 0 || appid.trim().equals("<<to be replaced>>")) {
-            throw new IllegalArgumentException("Property 'appid' of FacebookFilter needs to be provided. The value should be " +
-                    "appId (clientId) of your Facebook application");
-        }
-
-        if (appsecret == null || appsecret.length() == 0 || appsecret.trim().equals("<<to be replaced>>")) {
-            throw new IllegalArgumentException("Property 'appsecret' of FacebookFilter needs to be provided. The value should be " +
-                    "appSecret (clientSecret) of your Facebook application");
-        }
-
-        if (scope == null || scope.length() == 0) {
-            scope = "email";
-        }
-
-        if (redirectURL == null || redirectURL.length() == 0) {
-            redirectURL = "http://localhost:8080/" + getExoContainer().getContext().getName() + "/facebookAuth";
-        }
-
-        log.info("FacebookFilter configuration: appid=" + this.appid +
-                ", appsecret=" + this.appsecret +
-                ", scope=" + this.scope +
-                ", redirectURL=" + this.redirectURL);
-
-        // Use empty rolesList because we don't need rolesList for GateIn integration
-        facebookProcessor = new FacebookProcessor(appid, appsecret, scope, redirectURL, Arrays.asList(new String[]{}));
-
         authenticationRegistry = (AuthenticationRegistry)getExoContainer().getComponentInstanceOfType(AuthenticationRegistry.class);
+        facebookProcessor = (GateInFacebookProcessor)getExoContainer().getComponentInstanceOfType(GateInFacebookProcessor.class);
     }
 
     @Override
     public void destroy() {
     }
 
-    protected String getRedirectURL() {
-        return redirectURL;
-    }
-
-    protected String getAppid() {
-        return appid;
-    }
-
-    protected String getAppsecret() {
-        return appsecret;
-    }
-
-    protected String getScope() {
-        return scope;
-    }
-
-    protected FacebookProcessor getFacebookProcessor() {
-        return facebookProcessor;
-    }
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpServletResponse httpResponse = (HttpServletResponse)response;
-        HttpSession session = httpRequest.getSession();
-        String state = (String) session.getAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
 
-        if (log.isTraceEnabled()) {
-            log.trace("state=" + state);
-        }
+        FacebookInteractionState interactionState = facebookProcessor.processFacebookInteraction(httpRequest, httpResponse);
 
-        // Very initial request to portal
-        if (state == null || state.isEmpty()) {
-            facebookProcessor.initialInteraction(httpRequest, httpResponse);
-            return;
-        }
-
-        // We have sent an auth request
-        if (state.equals(FacebookProcessor.STATES.AUTH.name())) {
-            facebookProcessor.handleAuthStage(httpRequest, httpResponse);
-            return;
-        }
-
-        // Finish OAuth handshake
-        if (state.equals(FacebookProcessor.STATES.AUTHZ.name())) {
-            FacebookPrincipal principal = (FacebookPrincipal)facebookProcessor.handleAuthenticationResponse(httpRequest, httpResponse);
+        if (FacebookProcessor.STATES.FINISH.name().equals(interactionState.getState())) {
+            FacebookPrincipal principal = interactionState.getFacebookPrincipal();
 
             if (principal == null) {
                 log.error("Principal was null. Maybe login modules need to be configured properly.");
             } else {
-                httpRequest.getSession().setAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE, FacebookProcessor.STATES.FINISH.name());
-
                 if (log.isTraceEnabled()) {
                     log.trace("Obtained principal from Facebook authentication: " + principal);
                     log.trace("Facebook accessToken: " + principal.getAccessToken());
                 }
-                authenticationRegistry.setAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL, principal);
+
+                OAuthPrincipal oauthPrincipal = OAuthUtils.convertFacebookPrincipalToOAuthPrincipal(principal);
+
+                // Remove attribute with state of facebookLogin
+                httpRequest.getSession().removeAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
+
+                if (httpRequest.getRemoteUser() == null) {
+                    // Save authenticated OAuthPrincipal to authenticationRegistry in case that we are anonymous user
+                    // Other filter should take care of processing it and perform GateIn login or registration
+                    authenticationRegistry.setAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL, oauthPrincipal);
+                } else {
+                    // For authenticated user, we will save it as request attribute and process it by other filter, which will update
+                    // userProfile with new username and accessToken
+                    httpRequest.setAttribute(OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL, oauthPrincipal);
+                }
 
                 // Continue with request
                 chain.doFilter(request, response);

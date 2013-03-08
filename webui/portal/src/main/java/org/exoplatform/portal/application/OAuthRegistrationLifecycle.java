@@ -62,16 +62,17 @@ public class OAuthRegistrationLifecycle implements ApplicationLifecycle<PortalRe
         User oauthAuthenticatedUser = (User)authRegistry.getAttributeOfClient(context.getRequest(), OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
 
         if (oauthAuthenticatedUser != null) {
-
-            if (log.isTraceEnabled()) {
-                log.trace("Found user, which has been authenticated through OAuth. Username is " + oauthAuthenticatedUser.getUserName() +
-                        ". Will redirect to registration form");
-            }
-
             UIPortalApplication uiApp = Util.getUIPortalApplication();
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
 
+            if (log.isTraceEnabled()) {
+                log.trace("Found user, which has been authenticated through OAuth. Username is " + oauthAuthenticatedUser.getUserName());
+            }
+
             if (!uiMaskWS.isShow() || !uiMaskWS.getUIComponent().getClass().equals(UIRegisterOAuth.class)) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Showing registration form for OAuth registration");
+                }
                 UIComponent uiLogin = uiMaskWS.createUIComponent(UIRegisterOAuth.class, null, null);
                 uiMaskWS.setUIComponent(uiLogin);
                 Util.getPortalRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);

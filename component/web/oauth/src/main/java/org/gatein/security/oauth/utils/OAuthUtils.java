@@ -21,22 +21,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.data;
+package org.gatein.security.oauth.utils;
 
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.impl.UserImpl;
+import org.gatein.security.oauth.generic.OAuthPrincipal;
 import org.gatein.security.oauth.generic.OAuthProviderType;
+import org.picketlink.social.standalone.fb.FacebookPrincipal;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public interface SocialNetworkService {
+public class OAuthUtils {
 
-    User findUserByOAuthProviderUsername(OAuthProviderType oauthProviderType, String oauthProviderUsername);
+    public static OAuthPrincipal convertFacebookPrincipalToOAuthPrincipal(FacebookPrincipal facebookPrincipal) {
+        return new OAuthPrincipal(facebookPrincipal.getUsername(), facebookPrincipal.getFirstName(), facebookPrincipal.getLastName(),
+                facebookPrincipal.getAttribute("name"), facebookPrincipal.getEmail(), facebookPrincipal.getAccessToken(), OAuthProviderType.FACEBOOK);
+    }
 
-    void updateOAuthAccessToken(OAuthProviderType oauthProviderType, String username, String accessToken);
-
-    String getOAuthAccessToken(OAuthProviderType oauthProviderType, String username);
-
-    void updateOAuthInfo(OAuthProviderType oauthProviderType, String username, String oauthUsername, String accessToken);
-
+    public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {
+        User gateinUser = new UserImpl(principal.getUserName());
+        gateinUser.setFirstName(principal.getFirstName());
+        gateinUser.setLastName(principal.getLastName());
+        gateinUser.setEmail(principal.getEmail());
+        gateinUser.setDisplayName(principal.getDisplayName());
+        return gateinUser;
+    }
 }

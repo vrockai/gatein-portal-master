@@ -33,7 +33,7 @@ import org.exoplatform.services.organization.UserProfileHandler;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.gatein.security.oauth.utils.OAuthProviderType;
+import org.gatein.security.oauth.generic.OAuthProviderType;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

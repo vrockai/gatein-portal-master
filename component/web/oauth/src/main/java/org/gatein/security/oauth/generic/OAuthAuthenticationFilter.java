@@ -21,10 +21,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.facebook;
+package org.gatein.security.oauth.generic;
 
 import java.io.IOException;
-import java.security.Principal;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -32,20 +31,16 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.impl.UserImpl;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.data.SocialNetworkService;
 import org.gatein.security.oauth.utils.OAuthConstants;
-import org.gatein.security.oauth.utils.OAuthProviderType;
+import org.gatein.security.oauth.utils.OAuthUtils;
 import org.gatein.sso.agent.GenericAgent;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
-import org.picketlink.social.standalone.fb.FacebookPrincipal;
-import org.picketlink.social.standalone.fb.FacebookProcessor;
 
 /**
  * This filter has already access to authenticated OAuth principal, so it's work starts after successful OAuth authentication.
@@ -54,9 +49,9 @@ import org.picketlink.social.standalone.fb.FacebookProcessor;
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
+public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
 
-    private static Logger log = LoggerFactory.getLogger(OAuthIntegrationFilter.class);
+    private static Logger log = LoggerFactory.getLogger(OAuthAuthenticationFilter.class);
 
     private String loginUrl;
     private String registrationUrl;
@@ -76,7 +71,7 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
         String attachUsernamePasswordToLoginURLConfig = getInitParameter("attachUsernamePasswordToLoginURL");
         this.attachUsernamePasswordToLoginURL = attachUsernamePasswordToLoginURLConfig == null ? true : Boolean.parseBoolean(attachUsernamePasswordToLoginURLConfig);
 
-        log.info("OAuthIntegrationFilter configuration: loginURL=" + loginUrl +
+        log.info("OAuthAuthenticationFilter configuration: loginURL=" + loginUrl +
                 ", registrationUrl=" + this.registrationUrl +
                 ", attachUsernamePasswordToLoginURL=" + this.attachUsernamePasswordToLoginURL);
 
@@ -93,6 +88,12 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpServletResponse httpResponse = (HttpServletResponse)response;
 
+        // Simply continue with request if we are already authenticated
+        if (httpRequest.getRemoteUser() != null) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         // Simply continue with request if we are in the middle of registration process
         User oauthAuthenticatedUser = (User)authenticationRegistry.getAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
         if (oauthAuthenticatedUser != null) {
@@ -100,16 +101,10 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
             return;
         }
 
-        HttpSession session = httpRequest.getSession();
-        String state = (String) session.getAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
+        OAuthPrincipal principal = (OAuthPrincipal)authenticationRegistry.getAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL);
 
-        if (FacebookProcessor.STATES.FINISH.name().equals(state)) {
-            Principal principal = (Principal)authenticationRegistry.getAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL);
-            if (principal == null) {
-                log.error("Principal was null. Maybe login modules need to be configured properly.");
-            }
-
-            processPrincipal(httpRequest, httpResponse, (FacebookPrincipal)principal);
+        if (principal != null) {
+            processPrincipal(httpRequest, httpResponse, principal);
             return;
         }  else {
             chain.doFilter(request, response);
@@ -117,29 +112,29 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
     }
 
 
-    protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FacebookPrincipal principal) throws IOException {
-        User portalUser = socialNetworkService.findUserByOAuthProviderUsername(OAuthProviderType.FACEBOOK, principal.getUsername());
+    protected void processPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, OAuthPrincipal principal) throws IOException {
+        User portalUser = socialNetworkService.findUserByOAuthProviderUsername(principal.getOauthProviderType(), principal.getUserName());
 
         if (portalUser == null) {
             // This means that user has been successfully authenticated via OAuth, but doesn't exist in GateIn. So we need to establish context
             // with AuthenticationRegistry and redirect to GateIn registration form
             handleRedirectToRegistrationForm(httpRequest, httpResponse, principal);
         } else {
-            // This means that user has been successfully authenticated via OAuth and exist GateIn. So we need to establish SSO context
+            // This means that user has been successfully authenticated via OAuth and exists in GateIn. So we need to establish SSO context
             // and clean our own local context from AuthenticationRegistry. Then redirect to loginUrl to perform GateIn WCI login
-            handleRedirectToPortalLogin(httpRequest, httpResponse, portalUser, principal.getAccessToken());
+            handleRedirectToPortalLogin(httpRequest, httpResponse, portalUser, principal);
             cleanAuthenticationContext(httpRequest);
         }
     }
 
 
-    protected void handleRedirectToRegistrationForm(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FacebookPrincipal principal)
+    protected void handleRedirectToRegistrationForm(HttpServletRequest httpRequest, HttpServletResponse httpResponse, OAuthPrincipal principal)
             throws IOException {
         if (log.isTraceEnabled()) {
-            log.trace("Not found portalUser with username " + principal.getUsername() + ". Redirecting to registration form");
+            log.trace("Not found portalUser with username " + principal.getUserName() + ". Redirecting to registration form");
         }
 
-        User gateInUser = convertOAuthPrincipalToGateInUser(principal);
+        User gateInUser = OAuthUtils.convertOAuthPrincipalToGateInUser(principal);
         authenticationRegistry.setAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER, gateInUser);
 
         String registrationRedirectUrl = httpResponse.encodeRedirectURL(registrationUrl);
@@ -147,10 +142,10 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
     }
 
 
-    protected void handleRedirectToPortalLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse, User portalUser, String accessToken)
+    protected void handleRedirectToPortalLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse, User portalUser, OAuthPrincipal principal)
             throws IOException {
         if (log.isTraceEnabled()) {
-            log.trace("Found portalUser " + portalUser + " corresponding to facebookPrincipal");
+            log.trace("Found portalUser " + portalUser + " corresponding to oauthPrincipal");
         }
 
         // TODO: Refactor this by made the method saveSSOCredentials public instead of protected
@@ -163,9 +158,9 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
 
         }.saveSSOCredentials(portalUser.getUserName(), httpRequest);
 
-        socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, portalUser.getUserName(), accessToken);
+        socialNetworkService.updateOAuthAccessToken(principal.getOauthProviderType(), portalUser.getUserName(), principal.getAccessToken());
 
-        // Now Facebook authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
+        // Now Facebook/Google authentication handshake is finished and credentials are in session. We can redirect to JAAS authentication
         String loginRedirectURL = httpResponse.encodeRedirectURL(getLoginRedirectUrl(httpRequest, portalUser.getUserName()));
         httpResponse.sendRedirect(loginRedirectURL);
     }
@@ -188,16 +183,6 @@ public class OAuthIntegrationFilter extends AbstractSSOInterceptor {
     protected void cleanAuthenticationContext(HttpServletRequest httpRequest) {
         authenticationRegistry.removeAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL);
         authenticationRegistry.removeAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
-        httpRequest.getSession().removeAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
     }
 
-
-    private User convertOAuthPrincipalToGateInUser(FacebookPrincipal principal) {
-        User gateinUser = new UserImpl(principal.getUsername());
-        gateinUser.setFirstName(principal.getFirstName());
-        gateinUser.setLastName(principal.getLastName());
-        gateinUser.setEmail(principal.getEmail());
-        gateinUser.setDisplayName(principal.getAttribute("name"));
-        return gateinUser;
-    }
 }

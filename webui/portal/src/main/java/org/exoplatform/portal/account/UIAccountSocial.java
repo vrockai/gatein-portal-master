@@ -73,6 +73,12 @@ public class UIAccountSocial extends UIForm {
         updateUIFields();
     }
 
+    @Override
+    public void processRender(WebuiRequestContext context) throws Exception {
+        updateUIFields();
+        super.processRender(context);
+    }
+
     private void updateUIFields() {
         OAuthUsernames oauthUsernames = getOauthUsernamesFromBackend();
         getUIStringInput(OAuthConstants.PROFILE_FACEBOOK_USERNAME).setValue(oauthUsernames.facebookUsername);
@@ -167,65 +173,6 @@ public class UIAccountSocial extends UIForm {
             }
         }
     }
-
-//    public static class ResetActionListener extends EventListener<UIAccountSocial> {
-//        public void execute(Event<UIAccountSocial> event) throws Exception {
-//            UIAccountSocial uiForm = event.getSource();
-//
-//            OAuthUsernames oauthUsernames = uiForm.getOauthUsernamesFromBackend();
-//            uiForm.getUIStringInput(OAuthConstants.PROFILE_FACEBOOK_USERNAME).setValue(oauthUsernames.facebookUsername);
-//            uiForm.getUIStringInput(OAuthConstants.PROFILE_GOOGLE_USERNAME).setValue(oauthUsernames.googleUsername);
-//
-//            event.getRequestContext().addUIComponentToUpdateByAjax(uiForm);
-//        }
-//    }
-//
-//    public static class SaveActionListener extends EventListener<UIAccountSocial> {
-//        public void execute(Event<UIAccountSocial> event) throws Exception {
-//            UIAccountSocial uiForm = event.getSource();
-//
-//            OrganizationService service = uiForm.getApplicationComponent(OrganizationService.class);
-//            WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-//            UIApplication uiApp = context.getUIApplication();
-//
-//            ConversationState state = ConversationState.getCurrent();
-//            String userName = ((User) state.getAttribute(CacheUserProfileFilter.USER_PROFILE)).getUserName();
-//            User user = service.getUserHandler().findUserByName(userName);
-//
-//            if (user != null) {
-//                UserProfile userProfile = (UserProfile)Util.getPortalRequestContext().getAttribute(UserProfileLifecycle.USER_PROFILE_ATTRIBUTE_NAME);
-//                userProfile.setAttribute(OAuthConstants.PROFILE_FACEBOOK_USERNAME, uiForm.getUIStringInput(OAuthConstants.PROFILE_FACEBOOK_USERNAME).getValue());
-//                userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_USERNAME, uiForm.getUIStringInput(OAuthConstants.PROFILE_GOOGLE_USERNAME).getValue());
-//
-//                try {
-//                    service.getUserProfileHandler().saveUserProfile(userProfile, true);
-//                    uiApp.addMessage(new ApplicationMessage("UIAccountSocial.msg.successful-update", null));
-//                } catch (GateInException gtnOauthException) {
-//                    // Show warning message if user with this facebookUsername (or googleUsername) already exists
-//                    if (gtnOauthException.getExceptionCode() == GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
-//                        Object[] args = UIUserProfileInputSet.convertOAuthExceptionAttributes(Util.getPortalRequestContext(), "UIAccountSocial.label.", gtnOauthException.getExceptionAttributes());
-//                        ApplicationMessage appMessage = new ApplicationMessage("UIUserProfileInputSet.msg.oauth-username-exists", args, ApplicationMessage.WARNING);
-//                        appMessage.setArgsLocalized(false);
-//                        uiApp.addMessage(appMessage);
-//                        return;
-//                    } else {
-//                        throw gtnOauthException;
-//                    }
-//                }
-//
-//                Util.getPortalRequestContext().setAttribute(UserProfileLifecycle.USER_PROFILE_ATTRIBUTE_NAME, userProfile);
-//                UIWorkingWorkspace uiWorkingWS = Util.getUIPortalApplication().getChild(UIWorkingWorkspace.class);
-//                uiWorkingWS.updatePortletsByName("UserInfoPortlet");
-//                uiWorkingWS.updatePortletsByName("OrganizationPortlet");
-//            } else {
-//                JavascriptManager jsManager = Util.getPortalRequestContext().getJavascriptManager();
-//                jsManager.require("SHARED/base").addScripts(
-//                        "if(confirm('"
-//                                + Util.getPortalRequestContext().getApplicationResourceBundle()
-//                                .getString("UIAccountProfiles.msg.NotExistingAccount") + "')) {eXo.portal.logout();}");
-//            }
-//        }
-//    }
 
     private static class OAuthUsernames {
         private final String facebookUsername;

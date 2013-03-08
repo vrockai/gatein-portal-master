@@ -21,22 +21,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.data;
+package org.gatein.security.oauth.facebook;
 
-import org.exoplatform.services.organization.User;
-import org.gatein.security.oauth.generic.OAuthProviderType;
+import org.picketlink.social.standalone.fb.FacebookPrincipal;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public interface SocialNetworkService {
+public class FacebookInteractionState {
 
-    User findUserByOAuthProviderUsername(OAuthProviderType oauthProviderType, String oauthProviderUsername);
+    private final String state;
+    private final FacebookPrincipal facebookPrincipal;
 
-    void updateOAuthAccessToken(OAuthProviderType oauthProviderType, String username, String accessToken);
+    public FacebookInteractionState(String state, FacebookPrincipal facebookPrincipal) {
+        this.state = state;
+        this.facebookPrincipal = facebookPrincipal;
+    }
 
-    String getOAuthAccessToken(OAuthProviderType oauthProviderType, String username);
+    public String getState() {
+        return state;
+    }
 
-    void updateOAuthInfo(OAuthProviderType oauthProviderType, String username, String oauthUsername, String accessToken);
-
+    public FacebookPrincipal getFacebookPrincipal() {
+        return facebookPrincipal;
+    }
 }
