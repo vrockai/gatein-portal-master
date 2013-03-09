@@ -31,6 +31,10 @@
     <type>org.gatein.security.oauth.utils.OAuthHelper</type>
     <init-params>
       <value-param>
+        <name>isOAuthEnabled</name>
+        <value>${gatein.oauth.enabled:false}</value>
+      </value-param>
+      <value-param>
         <name>isFacebookAuthenticationEnabled</name>
         <value>${gatein.oauth.facebook.enabled:false}</value>
       </value-param>
@@ -92,7 +96,7 @@
         </value-param>
         <value-param>
           <name>enabled</name>
-          <value>${gatein.oauth.facebook.enabled:true}</value>
+          <value>${gatein.oauth.facebook.enabled:false}</value>
         </value-param>
         <value-param>
           <name>filterMapping</name>
@@ -115,7 +119,7 @@
         </value-param>
         <value-param>
           <name>enabled</name>
-          <value>${gatein.oauth.facebook.enabled:true}</value>
+          <value>${gatein.oauth.enabled:false}</value>
         </value-param>
         <value-param>
           <name>filterMapping</name>
@@ -148,7 +152,7 @@
         </value-param>
         <value-param>
           <name>enabled</name>
-          <value>${gatein.oauth.facebook.enabled:true}</value>
+          <value>${gatein.oauth.enabled:false}</value>
         </value-param>
         <value-param>
           <name>filterMapping</name>

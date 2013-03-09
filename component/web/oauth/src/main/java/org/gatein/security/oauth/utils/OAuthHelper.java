@@ -33,12 +33,16 @@ import org.gatein.common.logging.LoggerFactory;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class OAuthHelper {
+    private final boolean oauthEnabled;
     private final boolean facebookAuthenticationEnabled;
     private final boolean googleAuthenticationEnabled;
 
     private static final Logger log = LoggerFactory.getLogger(OAuthHelper.class);
 
     public OAuthHelper(InitParams params) {
+        String oauthEnabledParam = params.getValueParam("isOAuthEnabled").getValue();
+        this.oauthEnabled = Boolean.parseBoolean(oauthEnabledParam);
+
         String facebookAuthenticationEnabledParam = params.getValueParam("isFacebookAuthenticationEnabled").getValue();
         this.facebookAuthenticationEnabled = Boolean.parseBoolean(facebookAuthenticationEnabledParam);
 
@@ -49,7 +53,7 @@ public class OAuthHelper {
     }
 
     public boolean isOauthEnabled() {
-        return facebookAuthenticationEnabled || googleAuthenticationEnabled;
+        return oauthEnabled;
     }
 
     public boolean isFacebookAuthenticationEnabled() {

@@ -148,15 +148,7 @@ public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
             log.trace("Found portalUser " + portalUser + " corresponding to oauthPrincipal");
         }
 
-        // TODO: Refactor this by made the method saveSSOCredentials public instead of protected
-        new GenericAgent() {
-
-            @Override
-            public void saveSSOCredentials(String username, HttpServletRequest httpRequest) {
-                super.saveSSOCredentials(username, httpRequest);
-            }
-
-        }.saveSSOCredentials(portalUser.getUserName(), httpRequest);
+        new GenericAgent() {}.saveSSOCredentials(portalUser.getUserName(), httpRequest);
 
         socialNetworkService.updateOAuthAccessToken(principal.getOauthProviderType(), portalUser.getUserName(), principal.getAccessToken());
 
