@@ -86,6 +86,8 @@ public class OAuthConstants {
 
     // Request parameters
 
-    public static final String PARAM_START_INTERACTION = "startInteraction";
+    public static final String PARAM_OAUTH_INTERACTION = "_oauthInteraction";
+
+    public static final String PARAM_OAUTH_INTERACTION_VALUE_START = "start";
 
 }

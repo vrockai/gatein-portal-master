@@ -31,10 +31,10 @@ import org.gatein.security.oauth.common.utils.OAuthConstants;
 public enum OAuthProviderType {
     FACEBOOK(OAuthConstants.PROFILE_FACEBOOK_USERNAME,
             OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN,
-            OAuthConstants.FACEBOOK_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_START_INTERACTION + "=true"),
+            OAuthConstants.FACEBOOK_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START),
     GOOGLE(OAuthConstants.PROFILE_GOOGLE_USERNAME,
             OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN,
-            OAuthConstants.GOOGLE_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_START_INTERACTION + "=true");
+            OAuthConstants.GOOGLE_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START);
 
     private final String userNameAttrName;
     private final String accessTokenAttrName;

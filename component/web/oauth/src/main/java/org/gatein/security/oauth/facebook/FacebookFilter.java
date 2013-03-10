@@ -69,6 +69,12 @@ public class FacebookFilter extends AbstractSSOInterceptor {
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpServletResponse httpResponse = (HttpServletResponse)response;
 
+        // Restart current state if 'oauthInteraction' param has value 'start'
+        String interaction = httpRequest.getParameter(OAuthConstants.PARAM_OAUTH_INTERACTION);
+        if (OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START.equals(interaction)) {
+            httpRequest.getSession().removeAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
+        }
+
         FacebookInteractionState interactionState = facebookProcessor.processFacebookInteraction(httpRequest, httpResponse);
 
         if (FacebookProcessor.STATES.FINISH.name().equals(interactionState.getState())) {
