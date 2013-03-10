@@ -25,6 +25,8 @@ package org.gatein.security.oauth.generic;
 
 import java.security.Principal;
 
+import org.gatein.security.oauth.common.generic.OAuthProviderType;
+
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */

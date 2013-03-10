@@ -37,8 +37,8 @@ import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.common.utils.OAuthConstants;
 import org.gatein.security.oauth.data.SocialNetworkService;
-import org.gatein.security.oauth.utils.OAuthConstants;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
 
 /**

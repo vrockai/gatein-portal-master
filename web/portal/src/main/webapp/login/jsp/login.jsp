@@ -23,7 +23,8 @@
 <%@ page import="javax.servlet.http.Cookie"%>
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
-<%@ page import="org.gatein.security.oauth.utils.OAuthHelper"%>
+<%@ page import="org.gatein.security.oauth.common.utils.OAuthHelper"%>
+<%@ page import="org.gatein.security.oauth.common.generic.OAuthProviderType"%>
 <%@ page import="java.util.ResourceBundle"%>
 <%@ page import="org.gatein.common.text.EntityEncoder"%>
 <%@ page language="java"%>
@@ -108,10 +109,10 @@
                 <%/*End form*/%>
 
                 <% if (oauthHelper.isFacebookAuthenticationEnabled()) { %>
-                <a href="<%= oauthHelper.getFacebookAuthenticationUrl(contextPath) %>">SignIn with Facebook</a>
+                    <a href="<%= OAuthProviderType.FACEBOOK.getInitOAuthURL(contextPath) %>">SignIn with Facebook</a>
                 <% } %>
                 <% if (oauthHelper.isGoogleAuthenticationEnabled()) { %>
-                <a href="<%= oauthHelper.getGoogleAuthenticationUrl(contextPath) %>">SignIn with Google+</a>
+                    <a href="<%= OAuthProviderType.GOOGLE.getInitOAuthURL(contextPath) %>">SignIn with Google+</a>
                 <% } %>
         </div>
       </div>

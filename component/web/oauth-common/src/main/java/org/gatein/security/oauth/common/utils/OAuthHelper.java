@@ -21,7 +21,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.utils;
+package org.gatein.security.oauth.common.utils;
 
 import org.exoplatform.container.xml.InitParams;
 import org.gatein.common.logging.Logger;
@@ -64,11 +64,4 @@ public class OAuthHelper {
         return googleAuthenticationEnabled;
     }
 
-    public String getFacebookAuthenticationUrl(String contextPath) {
-        return contextPath + OAuthConstants.FACEBOOK_AUTHENTICATION_URL_PATH;
-    }
-
-    public String getGoogleAuthenticationUrl(String contextPath) {
-        return contextPath + OAuthConstants.GOOGLE_AUTHENTICATION_URL_PATH;
-    }
 }

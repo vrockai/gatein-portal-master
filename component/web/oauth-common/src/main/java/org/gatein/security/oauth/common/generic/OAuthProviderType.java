@@ -21,23 +21,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.generic;
+package org.gatein.security.oauth.common.generic;
 
-import org.gatein.security.oauth.utils.OAuthConstants;
+import org.gatein.security.oauth.common.utils.OAuthConstants;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public enum OAuthProviderType {
-    FACEBOOK(OAuthConstants.PROFILE_FACEBOOK_USERNAME, OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN),
-    GOOGLE(OAuthConstants.PROFILE_GOOGLE_USERNAME, OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN);
+    FACEBOOK(OAuthConstants.PROFILE_FACEBOOK_USERNAME,
+            OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN,
+            OAuthConstants.FACEBOOK_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_START_INTERACTION + "=true"),
+    GOOGLE(OAuthConstants.PROFILE_GOOGLE_USERNAME,
+            OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN,
+            OAuthConstants.GOOGLE_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_START_INTERACTION + "=true");
 
     private final String userNameAttrName;
     private final String accessTokenAttrName;
+    private final String initOAuthURL;
 
-    OAuthProviderType(String userNameAttrName, String accessTokenAttrName) {
+    OAuthProviderType(String userNameAttrName, String accessTokenAttrName, String initOAuthURL) {
         this.userNameAttrName = userNameAttrName;
         this.accessTokenAttrName = accessTokenAttrName;
+        this.initOAuthURL = initOAuthURL;
     }
 
     public String getUserNameAttrName() {
@@ -46,5 +52,9 @@ public enum OAuthProviderType {
 
     public String getAccessTokenAttrName() {
         return accessTokenAttrName;
+    }
+
+    public String getInitOAuthURL(String contextPath) {
+        return contextPath + initOAuthURL;
     }
 }

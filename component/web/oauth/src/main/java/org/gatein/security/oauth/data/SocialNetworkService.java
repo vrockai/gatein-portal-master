@@ -24,7 +24,7 @@
 package org.gatein.security.oauth.data;
 
 import org.exoplatform.services.organization.User;
-import org.gatein.security.oauth.generic.OAuthProviderType;
+import org.gatein.security.oauth.common.generic.OAuthProviderType;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

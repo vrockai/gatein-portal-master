@@ -21,7 +21,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.utils;
+package org.gatein.security.oauth.common.utils;
 
 /**
  * Various constants related to OAuth
@@ -82,5 +82,10 @@ public class OAuthConstants {
     public static final String FACEBOOK_AUTHENTICATION_URL_PATH = "/facebookAuth";
 
     public static final String GOOGLE_AUTHENTICATION_URL_PATH = "/googleAuth";
+
+
+    // Request parameters
+
+    public static final String PARAM_START_INTERACTION = "startInteraction";
 
 }

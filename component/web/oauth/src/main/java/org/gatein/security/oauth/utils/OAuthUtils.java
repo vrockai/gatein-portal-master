@@ -25,8 +25,8 @@ package org.gatein.security.oauth.utils;
 
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
+import org.gatein.security.oauth.common.generic.OAuthProviderType;
 import org.gatein.security.oauth.generic.OAuthPrincipal;
-import org.gatein.security.oauth.generic.OAuthProviderType;
 import org.picketlink.social.standalone.fb.FacebookPrincipal;
 
 /**

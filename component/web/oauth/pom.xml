@@ -63,6 +63,10 @@
     </dependency>
     <dependency>
       <groupId>org.gatein.portal</groupId>
+      <artifactId>exo.portal.component.web.oauth-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.component.test.core</artifactId>
       <scope>test</scope>
     </dependency>

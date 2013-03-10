@@ -39,5 +39,6 @@
     <module>api</module>
     <module>security-jboss</module>
     <module>oauth</module>
+    <module>oauth-common</module>
   </modules>
 </project>

@@ -32,7 +32,7 @@ import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
-import org.gatein.security.oauth.generic.OAuthProviderType;
+import org.gatein.security.oauth.common.generic.OAuthProviderType;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

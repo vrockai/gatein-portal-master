@@ -1,7 +1,8 @@
 <%  
   import org.exoplatform.web.application.JavascriptManager;
   import javax.servlet.http.HttpSession;
-  import org.gatein.security.oauth.utils.OAuthHelper;
+  import org.gatein.security.oauth.common.utils.OAuthHelper;
+  import org.gatein.security.oauth.common.generic.OAuthProviderType;
   def rcontext = _ctx.getRequestContext();
   JavascriptManager jsmanager = rcontext.getJavascriptManager();
   jsmanager.addCustomizedOnLoadScript('document.getElementById("UIPortalComponentLogin").username.focus();');
@@ -50,10 +51,10 @@
             </form>
 
             <% if (oauthHelper.isFacebookAuthenticationEnabled()) { %>
-            <a href="<%= oauthHelper.getFacebookAuthenticationUrl(contextPath) %>">SignIn with Facebook</a>
+                <a href="<%= OAuthProviderType.FACEBOOK.getInitOAuthURL(contextPath) %>">SignIn with Facebook</a>
             <% } %>
             <% if (oauthHelper.isGoogleAuthenticationEnabled()) { %>
-            <a href="<%= oauthHelper.getGoogleAuthenticationUrl(contextPath) %>">SignIn with Google+</a>
+                <a href="<%= OAuthProviderType.GOOGLE.getInitOAuthURL(contextPath) %>">SignIn with Google+</a>
             <% } %>
 
           </div>

@@ -115,15 +115,8 @@ public class GateInFacebookProcessorImpl implements GateInFacebookProcessor {
             return new FacebookInteractionState(state, null);
         }
 
-        // We have sent an auth request
+        // We are authenticated in Facebook and our app is authorized. Finish OAuth handshake by obtaining accessToken and initial info
         if (state.equals(FacebookProcessor.STATES.AUTH.name())) {
-            facebookProcessor.handleAuthStage(httpRequest, httpResponse);
-            state = (String) session.getAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);
-            return new FacebookInteractionState(state, null);
-        }
-
-        // Finish OAuth handshake
-        if (state.equals(FacebookProcessor.STATES.AUTHZ.name())) {
             FacebookPrincipal principal = (FacebookPrincipal)facebookProcessor.handleAuthenticationResponse(httpRequest, httpResponse);
 
             if (principal == null) {

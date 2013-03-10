@@ -27,8 +27,8 @@
     xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.gatein.security.oauth.utils.OAuthHelper</key>
-    <type>org.gatein.security.oauth.utils.OAuthHelper</type>
+    <key>org.gatein.security.oauth.common.utils.OAuthHelper</key>
+    <type>org.gatein.security.oauth.common.utils.OAuthHelper</type>
     <init-params>
       <value-param>
         <name>isOAuthEnabled</name>
