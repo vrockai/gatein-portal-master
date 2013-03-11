@@ -54,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>org.gatein.sso</groupId>
-      <artifactId>sso-agent</artifactId>
+      <artifactId>sso-integration</artifactId>
     </dependency>
 
     <dependency>

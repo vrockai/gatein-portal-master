@@ -76,7 +76,7 @@ public enum OAuthProviderType {
     }
 
     /**
-     * @return true if at least one OAuthProvider is enabled
+     * @return true if at least one OAuth provider is enabled
      */
     public static boolean isOAuthEnabled() {
         OAuthProviderType[] allProviders = OAuthProviderType.values();

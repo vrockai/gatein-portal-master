@@ -56,6 +56,11 @@
     </init-params>
   </component>
 
+  <component>
+    <key>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</key>
+    <type>org.gatein.security.oauth.webapi.OAuthFilterIntegratorImpl</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>
@@ -66,11 +71,11 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>org.gatein.sso.integration.SSOFilterIntegrator</target-component>
+    <target-component>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</target-component>
     <component-plugin>
       <name>FacebookFilter</name>
       <set-method>addPlugin</set-method>
-      <type>org.gatein.sso.integration.SSOFilterIntegratorPlugin</type>
+      <type>org.gatein.security.oauth.webapi.OAuthFilterIntegratorPlugin</type>
       <init-params>
         <value-param>
           <name>filterClass</name>
@@ -89,19 +94,15 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>org.gatein.sso.integration.SSOFilterIntegrator</target-component>
+    <target-component>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</target-component>
     <component-plugin>
       <name>OAuthIntegrationFilter</name>
       <set-method>addPlugin</set-method>
-      <type>org.gatein.sso.integration.SSOFilterIntegratorPlugin</type>
+      <type>org.gatein.security.oauth.webapi.CustomOAuthFilterIntegratorPlugin</type>
       <init-params>
         <value-param>
           <name>filterClass</name>
           <value>org.gatein.security.oauth.generic.OAuthAuthenticationFilter</value>
-        </value-param>
-        <value-param>
-          <name>enabled</name>
-          <value>${gatein.oauth.enabled:false}</value>
         </value-param>
         <value-param>
           <name>filterMapping</name>
@@ -122,19 +123,15 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>org.gatein.sso.integration.SSOFilterIntegrator</target-component>
+    <target-component>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</target-component>
     <component-plugin>
       <name>OAuthLinkAccountFilter</name>
       <set-method>addPlugin</set-method>
-      <type>org.gatein.sso.integration.SSOFilterIntegratorPlugin</type>
+      <type>org.gatein.security.oauth.webapi.CustomOAuthFilterIntegratorPlugin</type>
       <init-params>
         <value-param>
           <name>filterClass</name>
           <value>org.gatein.security.oauth.generic.OAuthLinkAccountFilter</value>
-        </value-param>
-        <value-param>
-          <name>enabled</name>
-          <value>${gatein.oauth.enabled:false}</value>
         </value-param>
         <value-param>
           <name>filterMapping</name>
