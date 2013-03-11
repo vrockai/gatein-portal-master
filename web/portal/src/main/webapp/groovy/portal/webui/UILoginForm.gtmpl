@@ -1,7 +1,6 @@
 <%  
   import org.exoplatform.web.application.JavascriptManager;
   import javax.servlet.http.HttpSession;
-  import org.gatein.security.oauth.common.utils.OAuthHelper;
   import org.gatein.security.oauth.common.generic.OAuthProviderType;
   def rcontext = _ctx.getRequestContext();
   JavascriptManager jsmanager = rcontext.getJavascriptManager();
@@ -9,7 +8,6 @@
   HttpSession session = rcontext.getRequest().getSession();
   String requestPath = rcontext.getInitialURI();
   String contextPath = rcontext.getRequestContextPath();
-  OAuthHelper oauthHelper = uicomponent.getApplicationComponent(OAuthHelper.class);
   //session.setAttribute("initialURI", requestPath);
 %>
 <div class="UILoginForm">
@@ -25,7 +23,7 @@
       <div class="MiddleRightLoginDecorator">
         <div class="LoginDecoratorBackground">
           <div class="LoginDetailBox">
-            <form class="UIForm" id="$uicomponent.id" name="loginForm" action="<%= rcontext.getRequestContextPath() + "/login"%>" method="post" style="margin: 0px;">
+            <form class="UIForm" id="$uicomponent.id" name="loginForm" action="<%= contextPath + "/login"%>" method="post" style="margin: 0px;">
               <input type="hidden" name="initialURI" value="<%=requestPath %>"/>
               <div class="VerticalLayout">
                 <table class="UIFormGrid">
@@ -50,12 +48,7 @@
             </div>
             </form>
 
-            <% if (oauthHelper.isFacebookAuthenticationEnabled()) { %>
-                <a href="<%= OAuthProviderType.FACEBOOK.getInitOAuthURL(contextPath) %>">SignIn with Facebook</a>
-            <% } %>
-            <% if (oauthHelper.isGoogleAuthenticationEnabled()) { %>
-                <a href="<%= OAuthProviderType.GOOGLE.getInitOAuthURL(contextPath) %>">SignIn with Google+</a>
-            <% } %>
+            <% uicomponent.renderChildren(); %>
 
           </div>
         </div>

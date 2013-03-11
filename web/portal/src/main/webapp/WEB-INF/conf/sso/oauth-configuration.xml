@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+
 <!--
   ~ JBoss, a division of Red Hat
   ~ Copyright 2013, Red Hat Middleware, LLC, and individual
@@ -25,25 +26,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
     xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
-
-  <component>
-    <key>org.gatein.security.oauth.common.utils.OAuthHelper</key>
-    <type>org.gatein.security.oauth.common.utils.OAuthHelper</type>
-    <init-params>
-      <value-param>
-        <name>isOAuthEnabled</name>
-        <value>${gatein.oauth.enabled:false}</value>
-      </value-param>
-      <value-param>
-        <name>isFacebookAuthenticationEnabled</name>
-        <value>${gatein.oauth.facebook.enabled:false}</value>
-      </value-param>
-      <value-param>
-        <name>isGoogleAuthenticationEnabled</name>
-        <value>${gatein.oauth.google.enabled:false}</value>
-      </value-param>
-    </init-params>
-  </component>
 
   <component>
     <key>org.gatein.security.oauth.data.SocialNetworkService</key>

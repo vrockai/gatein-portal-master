@@ -23,7 +23,6 @@
 <%@ page import="javax.servlet.http.Cookie"%>
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
-<%@ page import="org.gatein.security.oauth.common.utils.OAuthHelper"%>
 <%@ page import="org.gatein.security.oauth.common.generic.OAuthProviderType"%>
 <%@ page import="java.util.ResourceBundle"%>
 <%@ page import="org.gatein.common.text.EntityEncoder"%>
@@ -42,7 +41,6 @@
   PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
   ResourceBundleService service = (ResourceBundleService) portalContainer.getComponentInstanceOfType(ResourceBundleService.class);
   ResourceBundle res = service.getResourceBundle(service.getSharedResourceBundleNames(), request.getLocale()) ;
-  OAuthHelper oauthHelper = (OAuthHelper) portalContainer.getComponentInstanceOfType(OAuthHelper.class);
   
   Cookie cookie = new Cookie(org.exoplatform.web.login.LoginServlet.COOKIE_NAME, "");
     cookie.setPath(request.getContextPath());
@@ -108,12 +106,15 @@
                 </form>
                 <%/*End form*/%>
 
-                <% if (oauthHelper.isFacebookAuthenticationEnabled()) { %>
-                    <a href="<%= OAuthProviderType.FACEBOOK.getInitOAuthURL(contextPath) %>">SignIn with Facebook</a>
-                <% } %>
-                <% if (oauthHelper.isGoogleAuthenticationEnabled()) { %>
-                    <a href="<%= OAuthProviderType.GOOGLE.getInitOAuthURL(contextPath) %>">SignIn with Google+</a>
-                <% } %>
+
+<%              for (OAuthProviderType oauthProvType : OAuthProviderType.values()) {
+                  if (oauthProvType.isEnabled()) {
+%>
+                    <a href="<%= oauthProvType.getInitOAuthURL(contextPath) %>">SignIn with <%= oauthProvType.getFriendlyName() %></a>
+<%
+                  }
+                }
+%>
         </div>
       </div>
     </div>

@@ -29,21 +29,34 @@ import org.gatein.security.oauth.common.utils.OAuthConstants;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public enum OAuthProviderType {
-    FACEBOOK(OAuthConstants.PROFILE_FACEBOOK_USERNAME,
-            OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN,
-            OAuthConstants.FACEBOOK_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START),
-    GOOGLE(OAuthConstants.PROFILE_GOOGLE_USERNAME,
-            OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN,
-            OAuthConstants.GOOGLE_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START);
 
+    FACEBOOK(OAuthConstants.PROPERTY_FACEBOOK_ENABLED,
+            OAuthConstants.PROFILE_FACEBOOK_USERNAME,
+            OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN,
+            OAuthConstants.FACEBOOK_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START,
+            "Facebook"),
+    GOOGLE(OAuthConstants.PROPERTY_GOOGLE_ENABLED,
+            OAuthConstants.PROFILE_GOOGLE_USERNAME,
+            OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN,
+            OAuthConstants.GOOGLE_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START,
+            "Google+");
+
+    private final boolean enabled;
     private final String userNameAttrName;
     private final String accessTokenAttrName;
     private final String initOAuthURL;
+    private final String friendlyName;
 
-    OAuthProviderType(String userNameAttrName, String accessTokenAttrName, String initOAuthURL) {
+    OAuthProviderType(String enabledPropertyName, String userNameAttrName, String accessTokenAttrName, String initOAuthURL, String friendlyName) {
+        this.enabled = Boolean.getBoolean(enabledPropertyName);
         this.userNameAttrName = userNameAttrName;
         this.accessTokenAttrName = accessTokenAttrName;
         this.initOAuthURL = initOAuthURL;
+        this.friendlyName = friendlyName;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public String getUserNameAttrName() {
@@ -56,5 +69,22 @@ public enum OAuthProviderType {
 
     public String getInitOAuthURL(String contextPath) {
         return contextPath + initOAuthURL;
+    }
+
+    public String getFriendlyName() {
+        return friendlyName;
+    }
+
+    /**
+     * @return true if at least one OAuthProvider is enabled
+     */
+    public static boolean isOAuthEnabled() {
+        OAuthProviderType[] allProviders = OAuthProviderType.values();
+        for (OAuthProviderType current : allProviders) {
+            if (current.isEnabled())
+                return true;
+        }
+
+        return false;
     }
 }
