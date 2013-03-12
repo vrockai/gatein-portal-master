@@ -35,6 +35,10 @@
     <type>org.exoplatform.web.security.security.SecureRandomService</type>
   </component>
 
+  <component>
+    <type>org.exoplatform.web.security.codec.CodecInitializer</type>
+  </component>
+
   <!-- Default CookieTokenService with salted hashing -->
   <component>
     <key>org.exoplatform.web.security.security.CookieTokenService</key>
