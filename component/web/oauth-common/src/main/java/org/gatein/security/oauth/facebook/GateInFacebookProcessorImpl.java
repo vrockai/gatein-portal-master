@@ -83,19 +83,6 @@ public class GateInFacebookProcessorImpl implements GateInFacebookProcessor {
         facebookProcessor = new FacebookProcessor(appid, appsecret, scope, redirectURL, Arrays.asList(new String[]{}));
     }
 
-    private void initialInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
-        facebookProcessor.initialInteraction(httpRequest, httpResponse);
-    }
-
-    private void handleAuthStage(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        facebookProcessor.handleAuthStage(httpRequest, httpResponse);
-    }
-
-    @Override
-    public FacebookPrincipal getPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        return (FacebookPrincipal)facebookProcessor.getPrincipal(httpRequest, httpResponse);
-    }
-
     @Override
     public FacebookInteractionState processFacebookAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
         HttpSession session = httpRequest.getSession();
@@ -127,5 +114,10 @@ public class GateInFacebookProcessorImpl implements GateInFacebookProcessor {
 
         // Likely shouldn't happen...
         return new FacebookInteractionState(state, null);
+    }
+
+    @Override
+    public FacebookPrincipal getPrincipal(String accessToken) {
+        return (FacebookPrincipal)facebookProcessor.readInIdentity(accessToken);
     }
 }

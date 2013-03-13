@@ -35,7 +35,7 @@ import org.gatein.security.oauth.social.FacebookPrincipal;
  */
 public interface GateInFacebookProcessor {
 
-    FacebookPrincipal getPrincipal(HttpServletRequest httpRequest, HttpServletResponse httpResponse);
+    FacebookPrincipal getPrincipal(String accessToken);
 
     FacebookInteractionState processFacebookAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException;
 }

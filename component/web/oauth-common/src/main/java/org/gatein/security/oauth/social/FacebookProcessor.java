@@ -153,9 +153,9 @@ public class FacebookProcessor {
                 return null;
             }
 
-            URLConnection connection = sendAccessTokenRequest(returnUrl, authorizationCode, response);
+            URLConnection connection = sendAccessTokenRequest(authorizationCode);
 
-            Map<String, String> params = formUrlDecode(readUrlContent(connection));
+            Map<String, String> params = OAuthUtils.formUrlDecode(OAuthUtils.readUrlContent(connection));
             String accessToken = params.get(OAuthConstants.ACCESS_TOKEN_PARAMETER);
             String expires = params.get(FacebookConstants.EXPIRES);
 
@@ -166,11 +166,11 @@ public class FacebookProcessor {
                 throw new RuntimeException("No access token found");
             }
 
-            return readInIdentity(request, response, accessToken, returnUrl);
+            return readInIdentity(accessToken);
         }
     }
 
-    protected URLConnection sendAccessTokenRequest(String returnUrl, String authorizationCode, HttpServletResponse response) {
+    protected URLConnection sendAccessTokenRequest(String authorizationCode) {
         String returnUri = returnURL;
 
         Map<String, String> params = new HashMap<String, String>();
@@ -193,9 +193,8 @@ public class FacebookProcessor {
         }
     }
 
-    private Principal readInIdentity(HttpServletRequest request, HttpServletResponse response, String accessToken,
-                                     String returnUrl) {
-        FacebookPrincipal facebookPrincipal = null;
+    public Principal readInIdentity(String accessToken) {
+        FacebookPrincipal facebookPrincipal;
         try {
             String urlString = new StringBuilder(FacebookConstants.PROFILE_ENDPOINT_URL).append("?access_token=")
                     .append(URLEncoder.encode(accessToken, "UTF-8")).toString();
@@ -203,7 +202,7 @@ public class FacebookProcessor {
                 log.trace("Profile read:" + urlString);
 
             URL profileUrl = new URL(urlString);
-            String profileContent = readUrlContent(profileUrl.openConnection());
+            String profileContent = OAuthUtils.readUrlContent(profileUrl.openConnection());
             JSONObject jsonObject = new JSONObject(profileContent);
 
             facebookPrincipal = new FacebookPrincipal();
@@ -217,7 +216,7 @@ public class FacebookProcessor {
             facebookPrincipal.setTimezone(jsonObject.getString("timezone"));
             facebookPrincipal.setLocale(jsonObject.getString("locale"));
             facebookPrincipal.setJsonObject(jsonObject);
-            if (jsonObject.getString("email") != null) {
+            if (jsonObject.has("email")) {
                 facebookPrincipal.setName(jsonObject.getString("email"));
                 facebookPrincipal.setEmail(jsonObject.getString("email"));
             }
@@ -230,40 +229,5 @@ public class FacebookProcessor {
         return facebookPrincipal;
     }
 
-    private String readUrlContent(URLConnection connection) {
-        StringBuilder result = new StringBuilder();
-        try {
-            Reader reader = new InputStreamReader(connection.getInputStream());
-            char[] buffer = new char[50];
-            int nrOfChars;
-            while ((nrOfChars = reader.read(buffer)) != -1) {
-                result.append(buffer, 0, nrOfChars);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return result.toString();
-    }
-
-    private Map<String, String> formUrlDecode(String encodedData) {
-        Map<String, String> params = new HashMap<String, String>();
-        String[] elements = encodedData.split("&");
-        for (String element : elements) {
-            String[] pair = element.split("=");
-            if (pair.length == 2) {
-                String paramName = pair[0];
-                String paramValue;
-                try {
-                    paramValue = URLDecoder.decode(pair[1], "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
-                }
-                params.put(paramName, paramValue);
-            } else {
-                throw new RuntimeException("Unexpected name-value pair in response: " + element);
-            }
-        }
-        return params;
-    }
 }
 
