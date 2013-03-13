@@ -52,8 +52,8 @@ import org.exoplatform.webui.organization.UIUserProfileInputSet;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.gatein.security.oauth.common.generic.OAuthProviderType;
-import org.gatein.security.oauth.common.utils.OAuthConstants;
+import org.gatein.security.oauth.common.OAuthProviderType;
+import org.gatein.security.oauth.common.OAuthConstants;
 
 /**
  * Social networks tab of user profile

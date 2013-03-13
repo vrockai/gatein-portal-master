@@ -22,24 +22,20 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>exo.portal.component.web</artifactId>
     <groupId>org.gatein.portal</groupId>
+    <artifactId>exo.portal.component.web</artifactId>
     <version>3.6.0.MO1-SNAPSHOT</version>
   </parent>
+
   <modelVersion>4.0.0</modelVersion>
-
-  <artifactId>exo.portal.component.web.oauth-common</artifactId>
+  <artifactId>exo.portal.component.web.oauth-web</artifactId>
   <packaging>jar</packaging>
-
-  <name>GateIn Portal Component Web OAuth Common</name>
-  <description>GateIn OAuth authentication and authorization common stuff</description>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  <name>GateIn Portal Component Web OAuth Web</name>
+  <description>GateIn OAuth authentication and authorization web components</description>
 
   <dependencies>
     <dependency>
@@ -52,30 +48,16 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.gatein.sso</groupId>
+      <artifactId>sso-integration</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.gatein.portal</groupId>
+      <artifactId>exo.portal.component.web.oauth-common</artifactId>
+    </dependency>
 
-    <dependency>
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.component.web.security</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.component.test.core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.component.identity</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.component.identity</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-    </dependency>
   </dependencies>
+
+
 </project>

@@ -88,7 +88,7 @@
       <init-params>
         <value-param>
           <name>filterClass</name>
-          <value>org.gatein.security.oauth.facebook.FacebookFilter</value>
+          <value>org.gatein.security.oauth.web.facebook.FacebookFilter</value>
         </value-param>
         <value-param>
           <name>enabled</name>
@@ -111,7 +111,7 @@
       <init-params>
         <value-param>
           <name>filterClass</name>
-          <value>org.gatein.security.oauth.generic.OAuthAuthenticationFilter</value>
+          <value>org.gatein.security.oauth.web.OAuthAuthenticationFilter</value>
         </value-param>
         <value-param>
           <name>filterMapping</name>
@@ -140,7 +140,7 @@
       <init-params>
         <value-param>
           <name>filterClass</name>
-          <value>org.gatein.security.oauth.generic.OAuthLinkAccountFilter</value>
+          <value>org.gatein.security.oauth.web.OAuthLinkAccountFilter</value>
         </value-param>
         <value-param>
           <name>filterMapping</name>

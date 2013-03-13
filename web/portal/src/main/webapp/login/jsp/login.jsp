@@ -23,7 +23,7 @@
 <%@ page import="javax.servlet.http.Cookie"%>
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
-<%@ page import="org.gatein.security.oauth.common.generic.OAuthProviderType"%>
+<%@ page import="org.gatein.security.oauth.common.OAuthProviderType"%>
 <%@ page import="java.util.ResourceBundle"%>
 <%@ page import="org.gatein.common.text.EntityEncoder"%>
 <%@ page language="java"%>

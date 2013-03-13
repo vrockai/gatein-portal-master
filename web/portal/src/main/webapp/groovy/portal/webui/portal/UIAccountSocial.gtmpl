@@ -1,5 +1,5 @@
 <%
-  import org.gatein.security.oauth.common.generic.OAuthProviderType;
+  import org.gatein.security.oauth.common.OAuthProviderType;
   String fieldName;
 %>
 <div class="UIForm $uicomponent.id">
