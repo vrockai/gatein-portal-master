@@ -23,8 +23,11 @@
 
 package org.gatein.security.oauth.test;
 
+import java.io.File;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URL;
 
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
@@ -34,6 +37,8 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.impl.UserImpl;
+import org.exoplatform.web.security.codec.AbstractCodec;
+import org.exoplatform.web.security.codec.CodecInitializer;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.common.utils.OAuthConstants;
 import org.gatein.security.oauth.data.SocialNetworkService;
@@ -50,12 +55,28 @@ public class TestSocialNetworkService extends AbstractKernelTest {
 
     private OrganizationService orgService;
     private SocialNetworkService socialNetworkService;
+    private AbstractCodec codec;
+
+    @Override
+    protected void beforeRunBare() {
+        String foundGateInConfDir = PropertyManager.getProperty("gatein.conf.dir");
+        if (foundGateInConfDir == null || foundGateInConfDir.length() == 0) {
+            /* A way to get the conf directory path */
+            URL tokenserviceConfUrl = Thread.currentThread().getContextClassLoader()
+                    .getResource("conf/exo.portal.component.web.oauth-configuration.xml");
+            File confDir = new File(tokenserviceConfUrl.getPath()).getParentFile();
+            PropertyManager.setProperty("gatein.conf.dir", confDir.getAbsolutePath());
+        }
+        super.beforeRunBare();
+    }
 
     @Override
     protected void setUp() throws Exception {
         PortalContainer portalContainer = PortalContainer.getInstance();
         orgService = (OrganizationService) portalContainer.getComponentInstanceOfType(OrganizationService.class);
         socialNetworkService = (SocialNetworkService) portalContainer.getComponentInstanceOfType(SocialNetworkService.class);
+        CodecInitializer codecInitializer = (CodecInitializer) portalContainer.getComponentInstanceOfType(CodecInitializer.class);
+        this.codec = codecInitializer.initCodec();
         begin();
     }
 
@@ -122,16 +143,55 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         orgService.getUserHandler().createUser(user1, false);
         orgService.getUserHandler().createUser(user2, false);
 
+        // Update some accessTokens
         socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName(), "aaa123");
         socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, user2.getUserName(), "bbb456");
         socialNetworkService.updateOAuthAccessToken(OAuthProviderType.GOOGLE, user1.getUserName(), "ccc789");
 
+        // Verify that accessTokens could be obtained
         assertEquals("aaa123", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
         assertEquals("bbb456", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user2.getUserName()));
         assertEquals("ccc789", socialNetworkService.getOAuthAccessToken(OAuthProviderType.GOOGLE, user1.getUserName()));
         assertNull(socialNetworkService.getOAuthAccessToken(OAuthProviderType.GOOGLE, user2.getUserName()));
 
-        // TODO: Verify that accessTokens are encoded by directly access them through userProfiles
+        // Directly obtain accessTokens from userProfile and verify that they are encoded
+        UserProfile userProfile1 = orgService.getUserProfileHandler().findUserProfileByName("testUser1");
+        UserProfile userProfile2 = orgService.getUserProfileHandler().findUserProfileByName("testUser2");
+        String encodedAccessToken1 = userProfile1.getAttribute(OAuthProviderType.FACEBOOK.getAccessTokenAttrName());
+        String encodedAccessToken2 = userProfile2.getAttribute(OAuthProviderType.FACEBOOK.getAccessTokenAttrName());
+        assertFalse("aaa123".equals(encodedAccessToken1));
+        assertFalse("bbb456".equals(encodedAccessToken2));
+        assertTrue(codec.encode("aaa123").equals(encodedAccessToken1));
+        assertTrue(codec.encode("bbb456").equals(encodedAccessToken2));
+    }
+
+    public void testInvalidationOfAccessTokens() throws Exception {
+        User user1 = new UserImpl("testUser1");
+        orgService.getUserHandler().createUser(user1, false);
+
+        // Update some accessToken and verify that it's available
+        socialNetworkService.updateOAuthInfo(OAuthProviderType.FACEBOOK, user1.getUserName(), "fbUsername1", "fbAccessToken1");
+        assertEquals("fbAccessToken1", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+
+        // Update some accessToken again
+        socialNetworkService.updateOAuthInfo(OAuthProviderType.FACEBOOK, user1.getUserName(), "fbUsername1", "fbAccessToken2");
+        assertEquals("fbAccessToken2", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+
+        // Update userProfile and change FB username. AccessToken should be invalidated
+        UserProfile userProfile1 = orgService.getUserProfileHandler().findUserProfileByName(user1.getUserName());
+        userProfile1.setAttribute(OAuthProviderType.FACEBOOK.getUserNameAttrName(), "fbUsername2");
+        orgService.getUserProfileHandler().saveUserProfile(userProfile1, true);
+        assertNull(socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+
+        // Update some accessToken and verify it's here now
+        socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName(), "fbAccessToken3");
+        assertEquals("fbAccessToken3", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+
+        // Null FB username and verify that accessToken is invalidated
+        userProfile1 = orgService.getUserProfileHandler().findUserProfileByName(user1.getUserName());
+        userProfile1.setAttribute(OAuthProviderType.FACEBOOK.getUserNameAttrName(), null);
+        orgService.getUserProfileHandler().saveUserProfile(userProfile1, true);
+        assertNull(socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
     }
 
 }

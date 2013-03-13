@@ -71,6 +71,15 @@
   </external-component-plugins>
 
   <external-component-plugins>
+    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
+    <component-plugin>
+      <name>AccessTokenInvalidationListener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.gatein.security.oauth.data.AccessTokenInvalidationListener</type>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
     <target-component>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</target-component>
     <component-plugin>
       <name>FacebookFilter</name>

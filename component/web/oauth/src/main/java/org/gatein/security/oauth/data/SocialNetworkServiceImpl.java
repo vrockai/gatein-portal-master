@@ -30,6 +30,8 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileHandler;
+import org.exoplatform.web.security.codec.AbstractCodec;
+import org.exoplatform.web.security.codec.CodecInitializer;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -43,9 +45,11 @@ public class SocialNetworkServiceImpl implements SocialNetworkService {
     private static Logger log = LoggerFactory.getLogger(SocialNetworkServiceImpl.class);
 
     private OrganizationService orgService;
+    private AbstractCodec codec;
 
-    public SocialNetworkServiceImpl(OrganizationService orgService) {
+    public SocialNetworkServiceImpl(OrganizationService orgService, CodecInitializer codecInitializer) {
         this.orgService = orgService;
+        this.codec = codecInitializer.initCodec();
     }
 
     @Override
@@ -118,13 +122,19 @@ public class SocialNetworkServiceImpl implements SocialNetworkService {
     }
 
     protected String encryptAccessToken(String accessToken) {
-        // TODO: implement
-        return accessToken;
+        if (accessToken == null) {
+            return null;
+        } else {
+            return codec.encode(accessToken);
+        }
     }
 
     protected String decryptAccessToken(String accessToken) {
-        // TODO: implement
-        return accessToken;
+        if (accessToken == null) {
+            return null;
+        } else {
+            return codec.decode(accessToken);
+        }
     }
 
 }

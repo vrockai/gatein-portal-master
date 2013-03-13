@@ -30,12 +30,25 @@
     <type>org.gatein.security.oauth.data.SocialNetworkServiceImpl</type>
   </component>
 
+  <component>
+    <type>org.exoplatform.web.security.codec.CodecInitializer</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>
       <name>UniqueOAuthProviderUsernameListener</name>
       <set-method>addListenerPlugin</set-method>
       <type>org.gatein.security.oauth.data.UniqueOAuthProviderUsernameListener</type>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
+    <component-plugin>
+      <name>AccessTokenInvalidationListener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.gatein.security.oauth.data.AccessTokenInvalidationListener</type>
     </component-plugin>
   </external-component-plugins>
 

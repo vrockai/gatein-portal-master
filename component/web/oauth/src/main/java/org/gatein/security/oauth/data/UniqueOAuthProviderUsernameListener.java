@@ -41,7 +41,7 @@ public class UniqueOAuthProviderUsernameListener extends UserProfileEventListene
 
     private final SocialNetworkService socialNetworkService;
 
-    public UniqueOAuthProviderUsernameListener(InitParams params, SocialNetworkService socialNetworkService) {
+    public UniqueOAuthProviderUsernameListener(SocialNetworkService socialNetworkService) {
         this.socialNetworkService = socialNetworkService;
     }
 
