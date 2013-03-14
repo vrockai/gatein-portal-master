@@ -23,7 +23,6 @@
 
 package org.gatein.security.oauth.twitter;
 
-import twitter4j.TwitterException;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
@@ -33,23 +32,23 @@ import twitter4j.auth.RequestToken;
  */
 public class TwitterInteractionState {
 
-    public enum State {
+    public enum STATE {
         AUTH, FINISH
     }
 
-    private final State state;
+    private final STATE state;
     private final RequestToken requestToken;
     private final AccessToken accessToken;
     private final User user;
 
-    TwitterInteractionState(State state, RequestToken requestToken, AccessToken accessToken, User user) {
+    TwitterInteractionState(STATE state, RequestToken requestToken, AccessToken accessToken, User user) {
         this.state = state;
         this.requestToken = requestToken;
         this.accessToken = accessToken;
         this.user = user;
     }
 
-    public State getState() {
+    public STATE getState() {
         return state;
     }
 

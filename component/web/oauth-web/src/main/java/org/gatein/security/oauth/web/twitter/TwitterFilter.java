@@ -77,7 +77,7 @@ public class TwitterFilter extends AbstractSSOInterceptor {
 
         TwitterInteractionState interactionState = twitterProcessor.processTwitterAuthInteraction(httpRequest, httpResponse);
 
-        if (TwitterInteractionState.State.FINISH.equals(interactionState.getState())) {
+        if (TwitterInteractionState.STATE.FINISH.equals(interactionState.getState())) {
             User twitterUser = interactionState.getUser();
             AccessToken accessToken = interactionState.getAccessToken();
 

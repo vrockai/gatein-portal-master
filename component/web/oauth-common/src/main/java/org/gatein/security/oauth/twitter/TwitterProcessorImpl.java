@@ -105,7 +105,7 @@ public class TwitterProcessorImpl implements TwitterProcessor {
                 // Redirect to twitter to perform authentication
                 response.sendRedirect(requestToken.getAuthenticationURL());
 
-                return new TwitterInteractionState(TwitterInteractionState.State.AUTH, requestToken, null, null);
+                return new TwitterInteractionState(TwitterInteractionState.STATE.AUTH, requestToken, null, null);
             } else {
                 String verifier = request.getParameter(OAuthConstants.OAUTH_VERIFIER);
 
@@ -116,7 +116,7 @@ public class TwitterProcessorImpl implements TwitterProcessor {
                 // Remove requestToken from session
                 session.removeAttribute(OAuthConstants.ATTRIBUTE_TWITTER_REQUEST_TOKEN);
 
-                return new TwitterInteractionState(TwitterInteractionState.State.FINISH, null, accessToken, twitterUser);
+                return new TwitterInteractionState(TwitterInteractionState.STATE.FINISH, null, accessToken, twitterUser);
             }
         } catch (TwitterException twitterException) {
             throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_TWITTER_ERROR, twitterException);

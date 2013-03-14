@@ -53,8 +53,22 @@ public class OAuthUtils {
     }
 
     public static OAuthPrincipal convertTwitterUserToOAuthPrincipal(twitter4j.User twitterUser, AccessToken twitterAccessToken) {
-        // TODO:
-        return new OAuthPrincipal(twitterUser.getName(), null, null, null, null, twitterAccessToken.getToken(), OAuthProviderType.TWITTER);
+        String fullName = twitterUser.getName();
+        String firstName;
+        String lastName;
+
+        int spaceIndex = fullName.lastIndexOf(' ');
+
+        if (spaceIndex != -1) {
+            firstName = fullName.substring(0, spaceIndex);
+            lastName = fullName.substring(spaceIndex + 1);
+        } else {
+            firstName = fullName;
+            lastName = null;
+        }
+
+        // TODO: email
+        return new OAuthPrincipal(twitterUser.getScreenName(), firstName, lastName, fullName, null, twitterAccessToken.getToken(), OAuthProviderType.TWITTER);
     }
 
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {
