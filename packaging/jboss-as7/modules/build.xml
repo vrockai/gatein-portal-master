@@ -149,6 +149,7 @@
       <maven-resource group="org.jgroups" artifact="jgroups"/>
       <maven-resource group="org.jibx" artifact="jibx-bind"/>
       <maven-resource group="org.jibx" artifact="jibx-run"/>
+      <maven-resource group="org.twitter4j" artifact="twitter4j-core"/>
       <maven-resource group="rhino" artifact="js"/>
       <maven-resource group="org.jsecurity" artifact="jsecurity"/>
       <maven-resource group="caja" artifact="json_simple"/>

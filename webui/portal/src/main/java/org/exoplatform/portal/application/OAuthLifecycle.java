@@ -84,9 +84,8 @@ public class OAuthLifecycle implements ApplicationLifecycle<PortalRequestContext
                 if (log.isTraceEnabled()) {
                     log.trace("Showing registration form for OAuth registration");
                 }
-                UIComponent uiLogin = uiMaskWS.createUIComponent(UIRegisterOAuth.class, null, null);
-                uiMaskWS.setUIComponent(uiLogin);
-                Util.getPortalRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
+                UIComponent uiRegisterOauth = uiMaskWS.createUIComponent(UIRegisterOAuth.class, null, null);
+                uiMaskWS.setUIComponent(uiRegisterOauth);
             }
         }
 

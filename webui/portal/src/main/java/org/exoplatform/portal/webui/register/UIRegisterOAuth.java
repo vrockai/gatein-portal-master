@@ -50,6 +50,7 @@ import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthConstants;
+import org.gatein.security.oauth.common.OAuthPrincipal;
 
 /**
  * Registration form for user, which has been successfully authenticated via OAuth2
@@ -150,11 +151,9 @@ public class UIRegisterOAuth extends UIContainer {
 
                 AuthenticationRegistry authRegistry = uiRegisterForm.getApplicationComponent(AuthenticationRegistry.class);
                 HttpServletRequest httpRequest = portalRequestContext.getRequest();
-                User portalUserFromOAuth = (User)authRegistry.getAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
-                String oauthUsername = portalUserFromOAuth.getUserName();
+                OAuthPrincipal oauthPrincipal = (OAuthPrincipal)authRegistry.getAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_OAUTH_PRINCIPAL);
 
-                // TODO: Google and others
-                newUserProfile.setAttribute(OAuthConstants.PROFILE_FACEBOOK_USERNAME, oauthUsername);
+                newUserProfile.setAttribute(oauthPrincipal.getOauthProviderType().getUserNameAttrName(), oauthPrincipal.getUserName());
                 try {
                     profileHandler.saveUserProfile(newUserProfile, true);
                 } catch (GateInException gtnOauthException) {

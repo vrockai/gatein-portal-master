@@ -38,15 +38,23 @@ import org.exoplatform.services.organization.impl.UserImpl;
 import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthPrincipal;
 import org.gatein.security.oauth.social.FacebookPrincipal;
+import twitter4j.auth.AccessToken;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class OAuthUtils {
 
+    // Converting objects
+
     public static OAuthPrincipal convertFacebookPrincipalToOAuthPrincipal(FacebookPrincipal facebookPrincipal) {
         return new OAuthPrincipal(facebookPrincipal.getUsername(), facebookPrincipal.getFirstName(), facebookPrincipal.getLastName(),
                 facebookPrincipal.getAttribute("name"), facebookPrincipal.getEmail(), facebookPrincipal.getAccessToken(), OAuthProviderType.FACEBOOK);
+    }
+
+    public static OAuthPrincipal convertTwitterUserToOAuthPrincipal(twitter4j.User twitterUser, AccessToken twitterAccessToken) {
+        // TODO:
+        return new OAuthPrincipal(twitterUser.getName(), null, null, null, null, twitterAccessToken.getToken(), OAuthProviderType.TWITTER);
     }
 
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {

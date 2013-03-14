@@ -53,6 +53,7 @@ import org.exoplatform.webui.form.UIFormStringInput;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.common.OAuthConstants;
+import org.gatein.security.oauth.common.OAuthProviderType;
 
 /**
  * Created by The eXo Platform SARL Author : Dang Van Minh minhdv81@yahoo.com Jun 28, 2006
@@ -66,8 +67,6 @@ public class UIUserProfileInputSet extends UIFormInputSet {
     public static final String MALE = "male";
 
     public static final String FEMALE = "female";
-
-    public static final String[] SOCIAL_INFO_KEYS = { OAuthConstants.PROFILE_FACEBOOK_USERNAME, OAuthConstants.PROFILE_GOOGLE_USERNAME };
 
     public UIUserProfileInputSet() {
     }
@@ -91,7 +90,7 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         addUIFormInput(businessInputSet);
 
         UIFormInputSet socialInputSet = new UIFormInputSet("SocialNetworksInfo");
-        addInput(socialInputSet, SOCIAL_INFO_KEYS);
+        addInput(socialInputSet, getSocialInfoKeys());
         socialInputSet.setRendered(false);
         addUIFormInput(socialInputSet);
     }
@@ -187,6 +186,15 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         Collections.sort(lang, new LanguagesComparator());
 
         langSelectBox.setOptions(lang);
+    }
+
+    private String[] getSocialInfoKeys() {
+        List<String> result = new ArrayList<String>();
+        for (OAuthProviderType oauthProvType : OAuthProviderType.values()) {
+            String oauthUsernameAttrName = oauthProvType.getUserNameAttrName();
+            result.add(oauthUsernameAttrName);
+        }
+        return result.toArray(new String[] {});
     }
 
     @SuppressWarnings("deprecation")

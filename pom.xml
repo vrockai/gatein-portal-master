@@ -76,6 +76,7 @@
     <!-- SSO deps -->
     <version.cas.client>3.2.1</version.cas.client>
     <version.picketlink.fed>2.1.4.Final</version.picketlink.fed>
+    <version.twitter4j>2.2.6</version.twitter4j>
 
     <!--
     Various log4j properties for unit tests, examples:
@@ -1100,6 +1101,12 @@
         <groupId>org.picketlink.distribution</groupId>
         <artifactId>picketlink-jbas7</artifactId>
         <version>${version.picketlink.fed}</version>
+      </dependency>
+      <!-- Used for OAuth integration with Twitter -->
+      <dependency>
+        <groupId>org.twitter4j</groupId>
+        <artifactId>twitter4j-core</artifactId>
+        <version>${version.twitter4j}</version>
       </dependency>
 
       <!-- TODO: Move to gatein-dep -->

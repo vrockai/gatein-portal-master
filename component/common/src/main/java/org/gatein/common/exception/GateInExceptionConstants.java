@@ -50,9 +50,14 @@ public class GateInExceptionConstants {
     public static final int EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME = 20;
 
     /**
+     * Some error during Twitter processing
+     */
+    public static final int EXCEPTION_CODE_TWITTER_ERROR = 40;
+
+    /**
      * This error could happen during initialization of AbstractCodec for symmetric encryption
      */
-    public static final int EXCEPTION_CODEC_INITIALIZATION = 30;
+    public static final int EXCEPTION_CODEC_INITIALIZATION = 200;
 
 
     // Key of exception attributes

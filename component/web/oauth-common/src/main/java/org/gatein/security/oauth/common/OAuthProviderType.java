@@ -37,7 +37,12 @@ public enum OAuthProviderType {
             OAuthConstants.PROFILE_GOOGLE_USERNAME,
             OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN,
             OAuthConstants.GOOGLE_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START,
-            "Google+");
+            "Google+"),
+    TWITTER(OAuthConstants.PROPERTY_TWITTER_ENABLED,
+            OAuthConstants.PROFILE_TWITTER_USERNAME,
+            OAuthConstants.PROFILE_TWITTER_ACCESS_TOKEN,
+            OAuthConstants.TWITTER_AUTHENTICATION_URL_PATH + "?" + OAuthConstants.PARAM_OAUTH_INTERACTION + "=" + OAuthConstants.PARAM_OAUTH_INTERACTION_VALUE_START,
+            "Twitter");
 
     private final boolean enabled;
     private final String userNameAttrName;
