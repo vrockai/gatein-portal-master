@@ -52,7 +52,12 @@ public class GateInExceptionConstants {
     /**
      * Some error during Twitter processing
      */
-    public static final int EXCEPTION_CODE_TWITTER_ERROR = 40;
+    public static final int EXCEPTION_CODE_TWITTER_ERROR = 30;
+
+    /**
+     * Error when bad access token is given as parameter
+     */
+    public static final int EXCEPTION_CODE_BAD_ACCESS_TOKEN = 40;
 
     /**
      * This error could happen during initialization of AbstractCodec for symmetric encryption

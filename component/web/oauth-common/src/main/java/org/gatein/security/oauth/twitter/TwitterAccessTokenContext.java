@@ -23,27 +23,24 @@
 
 package org.gatein.security.oauth.twitter;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.gatein.common.exception.GateInException;
-import twitter4j.Twitter;
-import twitter4j.User;
-import twitter4j.auth.AccessToken;
-
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public interface TwitterProcessor {
+public class TwitterAccessTokenContext {
 
-    TwitterInteractionState processTwitterAuthInteraction(HttpServletRequest request, HttpServletResponse response) throws
-            IOException, GateInException;
+    private final String accessToken;
+    private final String accessTokenSecret;
 
-    String getStringFromAccessToken(AccessToken accessToken);
+    public TwitterAccessTokenContext(String accessToken, String accessTokenSecret) {
+        this.accessToken = accessToken;
+        this.accessTokenSecret = accessTokenSecret;
+    }
 
-    TwitterAccessTokenContext getAccessTokenFromString(String accessTokenString);
+    public String getAccessToken() {
+        return accessToken;
+    }
 
-    Twitter getAuthorizedTwitterInstance(TwitterAccessTokenContext accessTokenContext);
+    public String getAccessTokenSecret() {
+        return accessTokenSecret;
+    }
 }

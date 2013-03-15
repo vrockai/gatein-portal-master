@@ -52,7 +52,7 @@ public class OAuthUtils {
                 facebookPrincipal.getAttribute("name"), facebookPrincipal.getEmail(), facebookPrincipal.getAccessToken(), OAuthProviderType.FACEBOOK);
     }
 
-    public static OAuthPrincipal convertTwitterUserToOAuthPrincipal(twitter4j.User twitterUser, AccessToken twitterAccessToken) {
+    public static OAuthPrincipal convertTwitterUserToOAuthPrincipal(twitter4j.User twitterUser, String accessTokenString) {
         String fullName = twitterUser.getName();
         String firstName;
         String lastName;
@@ -67,8 +67,7 @@ public class OAuthUtils {
             lastName = null;
         }
 
-        // TODO: email
-        return new OAuthPrincipal(twitterUser.getScreenName(), firstName, lastName, fullName, null, twitterAccessToken.getToken(), OAuthProviderType.TWITTER);
+        return new OAuthPrincipal(twitterUser.getScreenName(), firstName, lastName, fullName, null, accessTokenString, OAuthProviderType.TWITTER);
     }
 
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {

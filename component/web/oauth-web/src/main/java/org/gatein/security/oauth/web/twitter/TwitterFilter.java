@@ -84,12 +84,11 @@ public class TwitterFilter extends AbstractSSOInterceptor {
             if (twitterUser == null || accessToken == null) {
                 log.error("TwitterUser or accessToken was null. Maybe login modules need to be configured properly.");
             } else {
-                if (log.isTraceEnabled()) {
-                    log.trace("Obtained user from Twitter authentication: " + twitterUser);
-                    log.trace("Twitter accessToken: " + accessToken);
-                }
 
-                OAuthPrincipal oauthPrincipal = OAuthUtils.convertTwitterUserToOAuthPrincipal(twitterUser, accessToken);
+                // We need to convert accessToken to string before save it to DB
+                String accessTokenString = twitterProcessor.getStringFromAccessToken(accessToken);
+
+                OAuthPrincipal oauthPrincipal = OAuthUtils.convertTwitterUserToOAuthPrincipal(twitterUser, accessTokenString);
 
                 if (httpRequest.getRemoteUser() == null) {
                     // Save authenticated OAuthPrincipal to authenticationRegistry in case that we are anonymous user

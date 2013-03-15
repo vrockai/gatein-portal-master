@@ -43,6 +43,7 @@ import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+import twitter4j.conf.ConfigurationBuilder;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -50,6 +51,8 @@ import twitter4j.auth.RequestToken;
 public class TwitterProcessorImpl implements TwitterProcessor {
 
     private static Logger log = LoggerFactory.getLogger(TwitterProcessorImpl.class);
+
+    private static final String ACCESS_TOKEN_DELIMITER = "@_@_@";
 
     private final String redirectURL;
     private final String clientID;
@@ -81,14 +84,16 @@ public class TwitterProcessorImpl implements TwitterProcessor {
                 ", clientSecret=" + clientSecret +
                 ", redirectURL=" + redirectURL);
 
-        twitterFactory = new TwitterFactory();
+        // Create 'generic' twitterFactory for user authentication to GateIn
+        ConfigurationBuilder builder = new ConfigurationBuilder();
+        builder.setOAuthConsumerKey(clientID).setOAuthConsumerSecret(clientSecret);
+        twitterFactory = new TwitterFactory(builder.build());
     }
 
     @Override
     public TwitterInteractionState processTwitterAuthInteraction(HttpServletRequest request, HttpServletResponse response) throws
             IOException, GateInException {
         Twitter twitter = twitterFactory.getInstance();
-        twitter.setOAuthConsumer(clientID, clientSecret);
 
         HttpSession session = request.getSession();
 
@@ -102,6 +107,10 @@ public class TwitterProcessorImpl implements TwitterProcessor {
                 // Save requestToken to session, but only temporarily until oauth workflow is finished
                 session.setAttribute(OAuthConstants.ATTRIBUTE_TWITTER_REQUEST_TOKEN, requestToken);
 
+                if (log.isTraceEnabled()) {
+                    log.trace("RequestToken obtained from twitter. Redirecting to Twitter for authorization");
+                }
+
                 // Redirect to twitter to perform authentication
                 response.sendRedirect(requestToken.getAuthenticationURL());
 
@@ -113,7 +122,12 @@ public class TwitterProcessorImpl implements TwitterProcessor {
                 AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, verifier);
                 User twitterUser = twitter.verifyCredentials();
 
-                // Remove requestToken from session
+                if (log.isTraceEnabled()) {
+                    log.trace("Obtained user from Twitter authentication: " + twitterUser);
+                    log.trace("Twitter accessToken: " + accessToken);
+                }
+
+                // Remove requestToken from session. We don't need it anymore
                 session.removeAttribute(OAuthConstants.ATTRIBUTE_TWITTER_REQUEST_TOKEN);
 
                 return new TwitterInteractionState(TwitterInteractionState.STATE.FINISH, null, accessToken, twitterUser);
@@ -123,5 +137,32 @@ public class TwitterProcessorImpl implements TwitterProcessor {
         }
     }
 
+    @Override
+    public String getStringFromAccessToken(AccessToken accessToken) {
+        return accessToken.getToken() + ACCESS_TOKEN_DELIMITER + accessToken.getTokenSecret();
+    }
 
+    @Override
+    public TwitterAccessTokenContext getAccessTokenFromString(String accessTokenStr) {
+        String[] strings = accessTokenStr.split(ACCESS_TOKEN_DELIMITER);
+
+        if (strings.length != 2) {
+            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_BAD_ACCESS_TOKEN, "Invalid accessTokenString given as argument. String was " + accessTokenStr);
+        }
+
+        return new TwitterAccessTokenContext(strings[0], strings[1]);
+    }
+
+    @Override
+    public Twitter getAuthorizedTwitterInstance(TwitterAccessTokenContext accessTokenContext) {
+        ConfigurationBuilder builder = new ConfigurationBuilder();
+        builder.setOAuthConsumerKey(clientID).setOAuthConsumerSecret(clientSecret);
+
+        // Now add accessToken properties to builder
+        builder.setOAuthAccessToken(accessTokenContext.getAccessToken());
+        builder.setOAuthAccessTokenSecret(accessTokenContext.getAccessTokenSecret());
+
+        // Return twitter instance with successfully established accessToken
+        return new TwitterFactory(builder.build()).getInstance();
+    }
 }
