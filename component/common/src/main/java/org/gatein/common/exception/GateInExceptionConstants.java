@@ -60,6 +60,16 @@ public class GateInExceptionConstants {
     public static final int EXCEPTION_CODE_BAD_ACCESS_TOKEN = 40;
 
     /**
+     * Error when state parameter from request parameter, which is sent from OAuth provider, is not equals to previously sent state
+     */
+    public static final int EXCEPTION_CODE_INVALID_STATE = 50;
+
+    /**
+     * Some error during Google processing
+     */
+    public static final int EXCEPTION_CODE_GOOGLE_ERROR = 60;
+
+    /**
      * This error could happen during initialization of AbstractCodec for symmetric encryption
      */
     public static final int EXCEPTION_CODEC_INITIALIZATION = 200;

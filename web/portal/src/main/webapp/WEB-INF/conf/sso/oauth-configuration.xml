@@ -68,10 +68,38 @@
         <name>clientSecret</name>
         <value>${gatein.oauth.twitter.clientSecret}</value>
       </value-param>
-      <!-- URL to redirect from Facebook during Facebook OAuth authentication -->
+      <!-- URL to redirect from Twitter during Twitter OAuth authentication -->
       <value-param>
         <name>redirectURL</name>
         <value>${gatein.oauth.twitter.redirectURL}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.gatein.security.oauth.google.GoogleProcessor</key>
+    <type>org.gatein.security.oauth.google.GoogleProcessorImpl</type>
+    <init-params>
+      <value-param>
+        <name>clientId</name>
+        <value>${gatein.oauth.google.clientId}</value>
+      </value-param>
+      <value-param>
+        <name>clientSecret</name>
+        <value>${gatein.oauth.google.clientSecret}</value>
+      </value-param>
+      <!-- URL to redirect from Google during Google OAuth2 authentication -->
+      <value-param>
+        <name>redirectURL</name>
+        <value>${gatein.oauth.google.redirectURL}</value>
+      </value-param>
+      <value-param>
+        <name>scope</name>
+        <value>${gatein.oauth.google.scope}</value>
+      </value-param>
+      <value-param>
+        <name>accessType</name>
+        <value>${gatein.oauth.google.accessType}</value>
       </value-param>
     </init-params>
   </component>
@@ -140,6 +168,29 @@
         <value-param>
           <name>filterMapping</name>
           <value>/twitterAuth</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.gatein.security.oauth.webapi.OAuthFilterIntegrator</target-component>
+    <component-plugin>
+      <name>GoogleFilter</name>
+      <set-method>addPlugin</set-method>
+      <type>org.gatein.security.oauth.webapi.OAuthFilterIntegratorPlugin</type>
+      <init-params>
+        <value-param>
+          <name>filterClass</name>
+          <value>org.gatein.security.oauth.web.google.GoogleFilter</value>
+        </value-param>
+        <value-param>
+          <name>enabled</name>
+          <value>${gatein.oauth.google.enabled:false}</value>
+        </value-param>
+        <value-param>
+          <name>filterMapping</name>
+          <value>/googleAuth</value>
         </value-param>
       </init-params>
     </component-plugin>

@@ -68,6 +68,7 @@
     <module name="org.jdom"/>
     <module name="org.slf4j"/>
     <module name="org.staxnav"/>
+    <module name="com.google.apis" />
     <module name="com.google.guava" export="true"/>
 
     <module name="org.jboss.threads"/>

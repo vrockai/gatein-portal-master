@@ -109,6 +109,10 @@ public class OAuthConstants {
 
     public static final String ATTRIBUTE_TWITTER_REQUEST_TOKEN = "_twitterRequestToken";
 
+    public static final String ATTRIBUTE_AUTH_STATE = "_authState";
+
+    public static final String ATTRIBUTE_VERIFICATION_STATE = "_verificationState";
+
     // URL
 
     public static final String FACEBOOK_AUTHENTICATION_URL_PATH = "/facebookAuth";

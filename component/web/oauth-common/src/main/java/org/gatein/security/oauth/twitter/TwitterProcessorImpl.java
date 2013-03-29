@@ -59,6 +59,14 @@ public class TwitterProcessorImpl implements TwitterProcessor {
     private final String clientSecret;
     private final TwitterFactory twitterFactory;
 
+    // Unit tests only
+    public TwitterProcessorImpl() {
+        redirectURL = null;
+        clientID = null;
+        clientSecret = null;
+        twitterFactory = null;
+    }
+
     public TwitterProcessorImpl(ExoContainerContext context, InitParams params) {
         this.clientID = params.getValueParam("clientId").getValue();
         this.clientSecret = params.getValueParam("clientSecret").getValue();

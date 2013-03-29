@@ -33,8 +33,12 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.services.oauth2.model.Userinfo;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
+import org.gatein.common.exception.GateInException;
+import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthPrincipal;
 import org.gatein.security.oauth.social.FacebookPrincipal;
@@ -68,6 +72,14 @@ public class OAuthUtils {
         }
 
         return new OAuthPrincipal(twitterUser.getScreenName(), firstName, lastName, fullName, null, accessTokenString, OAuthProviderType.TWITTER);
+    }
+
+    public static OAuthPrincipal convertGoogleInfoToOAuthPrincipal(Userinfo userInfo, String accessTokenString) {
+        // Assume that username is first part of email
+        String email = userInfo.getEmail();
+        String username = email.substring(0, email.indexOf('@'));
+        return new OAuthPrincipal(username, userInfo.getGivenName(), userInfo.getFamilyName(), userInfo.getName(), userInfo.getEmail(),
+                accessTokenString, OAuthProviderType.GOOGLE);
     }
 
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {
@@ -110,6 +122,14 @@ public class OAuthUtils {
             queryString.append(encodedParamValue);
         }
         return queryString.toString();
+    }
+
+    public static String encodeParam(String param) {
+        try {
+            return URLEncoder.encode(param, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_UNSPECIFIED, uee);
+        }
     }
 
     /**
