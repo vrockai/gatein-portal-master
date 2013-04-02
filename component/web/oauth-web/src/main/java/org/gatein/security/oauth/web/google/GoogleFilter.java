@@ -39,13 +39,9 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.common.OAuthPrincipal;
-import org.gatein.security.oauth.facebook.FacebookInteractionState;
-import org.gatein.security.oauth.facebook.GateInFacebookProcessor;
 import org.gatein.security.oauth.google.GoogleInteractionState;
 import org.gatein.security.oauth.google.GoogleProcessor;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
-import org.gatein.security.oauth.social.FacebookPrincipal;
-import org.gatein.security.oauth.social.FacebookProcessor;
 import org.gatein.security.oauth.utils.OAuthUtils;
 import org.gatein.sso.agent.filter.api.AbstractSSOInterceptor;
 
@@ -94,7 +90,7 @@ public class GoogleFilter extends AbstractSSOInterceptor {
                 log.trace("User info from Google: " + userInfo);
             }
 
-            OAuthPrincipal oauthPrincipal = OAuthUtils.convertGoogleInfoToOAuthPrincipal(userInfo, googleProcessor.getStringFromToken(tokenResponse), oAuthProviderTypeRegistry);
+            OAuthPrincipal<GoogleTokenResponse> oauthPrincipal = OAuthUtils.convertGoogleInfoToOAuthPrincipal(userInfo, tokenResponse, oAuthProviderTypeRegistry);
 
             if (httpRequest.getRemoteUser() == null) {
                 // Save authenticated OAuthPrincipal to authenticationRegistry in case that we are anonymous user

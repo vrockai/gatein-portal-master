@@ -32,10 +32,12 @@ import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.organization.UserProfile;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.common.OAuthCodec;
 import org.gatein.security.oauth.common.OAuthConstants;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -58,14 +60,6 @@ public class TwitterProcessorImpl implements TwitterProcessor {
     private final String clientID;
     private final String clientSecret;
     private final TwitterFactory twitterFactory;
-
-    // Unit tests only
-    public TwitterProcessorImpl() {
-        redirectURL = null;
-        clientID = null;
-        clientSecret = null;
-        twitterFactory = null;
-    }
 
     public TwitterProcessorImpl(ExoContainerContext context, InitParams params) {
         this.clientID = params.getValueParam("clientId").getValue();
@@ -146,22 +140,6 @@ public class TwitterProcessorImpl implements TwitterProcessor {
     }
 
     @Override
-    public String getStringFromAccessToken(AccessToken accessToken) {
-        return accessToken.getToken() + ACCESS_TOKEN_DELIMITER + accessToken.getTokenSecret();
-    }
-
-    @Override
-    public TwitterAccessTokenContext getAccessTokenFromString(String accessTokenStr) {
-        String[] strings = accessTokenStr.split(ACCESS_TOKEN_DELIMITER);
-
-        if (strings.length != 2) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_BAD_ACCESS_TOKEN, "Invalid accessTokenString given as argument. String was " + accessTokenStr);
-        }
-
-        return new TwitterAccessTokenContext(strings[0], strings[1]);
-    }
-
-    @Override
     public Twitter getAuthorizedTwitterInstance(TwitterAccessTokenContext accessTokenContext) {
         ConfigurationBuilder builder = new ConfigurationBuilder();
         builder.setOAuthConsumerKey(clientID).setOAuthConsumerSecret(clientSecret);
@@ -172,5 +150,37 @@ public class TwitterProcessorImpl implements TwitterProcessor {
 
         // Return twitter instance with successfully established accessToken
         return new TwitterFactory(builder.build()).getInstance();
+    }
+
+    @Override
+    public void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, TwitterAccessTokenContext accessToken) {
+        String encodedAccessToken = codec.encodeString(accessToken.getAccessToken());
+        String encodedAccessTokenSecret = codec.encodeString(accessToken.getAccessTokenSecret());
+        userProfile.setAttribute(OAuthConstants.PROFILE_TWITTER_ACCESS_TOKEN, encodedAccessToken);
+        userProfile.setAttribute(OAuthConstants.PROFILE_TWITTER_ACCESS_TOKEN_SECRET, encodedAccessTokenSecret);
+    }
+
+    @Override
+    public TwitterAccessTokenContext getAccessTokenFromUserProfile(UserProfile userProfile, OAuthCodec codec) {
+        String decodedAccessToken = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_TWITTER_ACCESS_TOKEN));
+        String decodedAccessTokenSecret = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_TWITTER_ACCESS_TOKEN_SECRET));
+
+        if (decodedAccessToken == null || decodedAccessTokenSecret == null) {
+            return null;
+        } else {
+            return new TwitterAccessTokenContext(decodedAccessToken, decodedAccessTokenSecret);
+        }
+    }
+
+    @Override
+    public void removeAccessTokenFromUserProfile(UserProfile userProfile) {
+        userProfile.setAttribute(OAuthConstants.PROFILE_TWITTER_ACCESS_TOKEN, null);
+        userProfile.setAttribute(OAuthConstants.PROFILE_TWITTER_ACCESS_TOKEN_SECRET, null);
+    }
+
+    @Override
+    public void revokeToken(TwitterAccessTokenContext accessToken) {
+        // TODO: (if it's possible with Twitter... Maybe it's noop)
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

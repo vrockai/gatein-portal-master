@@ -50,7 +50,7 @@ public class OAuthProviderTypeRegistryImpl implements OAuthProviderTypeRegistry 
 
             OAuthProviderType oauthPrType = oauthPlugin.getOAuthProviderType();
 
-            if (oauthPrType.isEnabled()) {
+            if (oauthPrType != null && oauthPrType.isEnabled()) {
                 this.oauthProviderTypes.put(oauthPrType.getKey(), oauthPrType);
                 log.debug("Added new OAuthProviderType " + oauthPrType);
             } else {
@@ -60,8 +60,8 @@ public class OAuthProviderTypeRegistryImpl implements OAuthProviderTypeRegistry 
     }
 
     @Override
-    public OAuthProviderType getOAuthProvider(String key) {
-        return oauthProviderTypes.get(key);
+    public <T> OAuthProviderType<T> getOAuthProvider(String key) {
+        return (OAuthProviderType<T>)oauthProviderTypes.get(key);
     }
 
     @Override

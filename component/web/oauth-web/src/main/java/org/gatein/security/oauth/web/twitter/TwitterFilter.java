@@ -38,6 +38,7 @@ import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.common.OAuthPrincipal;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
+import org.gatein.security.oauth.twitter.TwitterAccessTokenContext;
 import org.gatein.security.oauth.twitter.TwitterInteractionState;
 import org.gatein.security.oauth.twitter.TwitterProcessor;
 import org.gatein.security.oauth.utils.OAuthUtils;
@@ -88,10 +89,10 @@ public class TwitterFilter extends AbstractSSOInterceptor {
                 log.error("TwitterUser or accessToken was null. Maybe login modules need to be configured properly.");
             } else {
 
-                // We need to convert accessToken to string before save it to DB
-                String accessTokenString = twitterProcessor.getStringFromAccessToken(accessToken);
+                // We need to convert accessToken to our format before save it to DB
+                TwitterAccessTokenContext accessTokenContext = new TwitterAccessTokenContext(accessToken.getToken(), accessToken.getTokenSecret());
 
-                OAuthPrincipal oauthPrincipal = OAuthUtils.convertTwitterUserToOAuthPrincipal(twitterUser, accessTokenString, oAuthProviderTypeRegistry);
+                OAuthPrincipal<TwitterAccessTokenContext> oauthPrincipal = OAuthUtils.convertTwitterUserToOAuthPrincipal(twitterUser, accessTokenContext, oAuthProviderTypeRegistry);
 
                 if (httpRequest.getRemoteUser() == null) {
                     // Save authenticated OAuthPrincipal to authenticationRegistry in case that we are anonymous user

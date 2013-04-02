@@ -21,22 +21,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.facebook;
-
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.gatein.security.oauth.common.OAuthProviderProcessor;
-import org.gatein.security.oauth.social.FacebookPrincipal;
+package org.gatein.security.oauth.common;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public interface GateInFacebookProcessor extends OAuthProviderProcessor<String> {
+public interface OAuthCodec {
 
-    FacebookPrincipal getPrincipal(String accessToken);
+    String encodeString(String input);
 
-    FacebookInteractionState processFacebookAuthInteraction(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException;
+    String decodeString(String input);
 }

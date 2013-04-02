@@ -106,7 +106,6 @@ public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
 
         if (principal != null) {
             processPrincipal(httpRequest, httpResponse, principal);
-            return;
         }  else {
             chain.doFilter(request, response);
         }

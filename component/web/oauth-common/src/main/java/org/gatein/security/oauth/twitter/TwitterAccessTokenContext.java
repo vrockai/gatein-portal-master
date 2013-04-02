@@ -32,6 +32,10 @@ public class TwitterAccessTokenContext {
     private final String accessTokenSecret;
 
     public TwitterAccessTokenContext(String accessToken, String accessTokenSecret) {
+        if (accessToken == null || accessTokenSecret == null) {
+            throw new IllegalArgumentException("Passed arguments need to be non-null. Passed arguments: accessToken=" +
+                    accessToken + ", accessTokenSecret=" + accessTokenSecret);
+        }
         this.accessToken = accessToken;
         this.accessTokenSecret = accessTokenSecret;
     }
@@ -42,5 +46,23 @@ public class TwitterAccessTokenContext {
 
     public String getAccessTokenSecret() {
         return accessTokenSecret;
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (that == this) {
+            return true;
+        }
+
+        if (!(that instanceof TwitterAccessTokenContext)) {
+            return false;
+        }
+
+        TwitterAccessTokenContext thatt = (TwitterAccessTokenContext)that;
+        return this.accessToken.equals(thatt.getAccessToken()) && this.accessTokenSecret.equals(thatt.getAccessTokenSecret());
+    }
+
+    public int hashCode() {
+        return accessToken.hashCode() * 13 + accessTokenSecret.hashCode();
     }
 }

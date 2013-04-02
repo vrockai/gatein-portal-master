@@ -51,11 +51,13 @@ import com.google.api.services.plus.Plus;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.web.security.security.SecureRandomService;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.common.OAuthCodec;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.utils.OAuthUtils;
 
@@ -259,35 +261,57 @@ public class GoogleProcessorImpl implements GoogleProcessor {
     }
 
     @Override
+    public void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, GoogleTokenResponse accessToken) {
+        String encodedAccessToken = codec.encodeString(accessToken.getAccessToken());
+        String encodedIdToken = codec.encodeString(accessToken.getIdToken());
+        String encodedRefreshToken = codec.encodeString(accessToken.getRefreshToken());
+        String encodedScope = codec.encodeString(accessToken.getScope());
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN, encodedAccessToken);
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ID_TOKEN, encodedIdToken);
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN, encodedRefreshToken);
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_SCOPE, encodedScope);
+    }
+
+    @Override
+    public GoogleTokenResponse getAccessTokenFromUserProfile(UserProfile userProfile, OAuthCodec codec) {
+        String decodedAccessToken = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN));
+
+        // We don't have token in userProfile
+        if (decodedAccessToken == null) {
+            return null;
+        }
+
+        String decodedIdToken = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_GOOGLE_ID_TOKEN));
+        String decodedRefreshToken = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN));
+        String decodedScope = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_GOOGLE_SCOPE));
+        GoogleTokenResponse grc = new GoogleTokenResponse();
+        grc.setAccessToken(decodedAccessToken);
+        grc.setIdToken(decodedIdToken);
+        grc.setRefreshToken(decodedRefreshToken);
+        grc.setScope(decodedScope);
+        grc.setTokenType("Bearer");
+        grc.setExpiresInSeconds(1000L);
+        return grc;
+    }
+
+    @Override
+    public void removeAccessTokenFromUserProfile(UserProfile userProfile) {
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN, null);
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ID_TOKEN, null);
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN, null);
+        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_SCOPE, null);
+    }
+
+    @Override
     public void revokeToken(GoogleTokenResponse tokenData) {
         try {
             HttpResponse revokeResponse = TRANSPORT.createRequestFactory()
-                .buildGetRequest(new GenericUrl("https://accounts.google.com/o/oauth2/revoke?token=" + tokenData.getAccessToken())).execute();
+                    .buildGetRequest(new GenericUrl("https://accounts.google.com/o/oauth2/revoke?token=" + tokenData.getAccessToken())).execute();
             if (log.isTraceEnabled()) {
                 log.trace("Revoked token " + tokenData);
             }
         } catch (IOException ioe) {
             throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_GOOGLE_ERROR, "Error when revoking token", ioe);
-        }
-    }
-
-    @Override
-    public String getStringFromToken(GoogleTokenResponse tokenData) {
-        try {
-            return JSON_FACTORY.toString(tokenData);
-        } catch (IOException ioe) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_GOOGLE_ERROR, "Error during parsing", ioe);
-        }
-    }
-
-    @Override
-    public GoogleTokenResponse getTokenResponseFromString(String tokenResponseString) {
-        try {
-            ObjectParser parser = new JsonObjectParser(JSON_FACTORY);
-            Reader reader = new StringReader(tokenResponseString);
-            return parser.parseAndClose(reader, GoogleTokenResponse.class);
-        } catch (IOException ioe) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_GOOGLE_ERROR, "Error during parsing", ioe);
         }
     }
 }

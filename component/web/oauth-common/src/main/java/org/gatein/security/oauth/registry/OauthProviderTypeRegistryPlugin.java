@@ -23,21 +23,21 @@
 
 package org.gatein.security.oauth.registry;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.common.OAuthProviderProcessor;
 import org.gatein.security.oauth.common.OAuthProviderType;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OauthProviderTypeRegistryPlugin extends BaseComponentPlugin {
+public class OauthProviderTypeRegistryPlugin<T> extends BaseComponentPlugin {
 
     private final OAuthProviderType oauthPrType;
 
-    public OauthProviderTypeRegistryPlugin(InitParams params) {
+    public OauthProviderTypeRegistryPlugin(InitParams params, ExoContainerContext containerContext) throws Exception {
         String key = getParam(params, "key");
         String enabledPar = getParam(params, "enabled");
         String usernameAttributeName = getParam(params, "userNameAttributeName");
@@ -47,7 +47,16 @@ public class OauthProviderTypeRegistryPlugin extends BaseComponentPlugin {
 
         boolean enabled = Boolean.parseBoolean(enabledPar);
 
-        oauthPrType = new OAuthProviderType(key, enabled, usernameAttributeName, oauthProviderProcessorClass, initOAuthURL, friendlyName);
+        if (enabled) {
+            // TODO: better classloading
+            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+            Class<OAuthProviderProcessor<T>> processorClass = (Class<OAuthProviderProcessor<T>>)tccl.loadClass(oauthProviderProcessorClass);
+            OAuthProviderProcessor<T> oauthProviderProcessor = (OAuthProviderProcessor<T>)containerContext.getContainer().getComponentInstanceOfType(processorClass);
+
+            oauthPrType = new OAuthProviderType<T>(key, enabled, usernameAttributeName, oauthProviderProcessor, initOAuthURL, friendlyName);
+        } else {
+            oauthPrType = null;
+        }
     }
 
     OAuthProviderType getOAuthProviderType() {

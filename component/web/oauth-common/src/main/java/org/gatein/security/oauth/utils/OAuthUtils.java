@@ -40,11 +40,10 @@ import org.exoplatform.services.organization.impl.UserImpl;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.common.OAuthConstants;
-import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthPrincipal;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 import org.gatein.security.oauth.social.FacebookPrincipal;
-import twitter4j.auth.AccessToken;
+import org.gatein.security.oauth.twitter.TwitterAccessTokenContext;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -53,13 +52,13 @@ public class OAuthUtils {
 
     // Converting objects
 
-    public static OAuthPrincipal convertFacebookPrincipalToOAuthPrincipal(FacebookPrincipal facebookPrincipal, OAuthProviderTypeRegistry registry) {
-        return new OAuthPrincipal(facebookPrincipal.getUsername(), facebookPrincipal.getFirstName(), facebookPrincipal.getLastName(),
+    public static OAuthPrincipal<String> convertFacebookPrincipalToOAuthPrincipal(FacebookPrincipal facebookPrincipal, OAuthProviderTypeRegistry registry) {
+        return new OAuthPrincipal<String>(facebookPrincipal.getUsername(), facebookPrincipal.getFirstName(), facebookPrincipal.getLastName(),
                 facebookPrincipal.getAttribute("name"), facebookPrincipal.getEmail(), facebookPrincipal.getAccessToken(),
                 registry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_FACEBOOK));
     }
 
-    public static OAuthPrincipal convertTwitterUserToOAuthPrincipal(twitter4j.User twitterUser, String accessTokenString,
+    public static OAuthPrincipal<TwitterAccessTokenContext> convertTwitterUserToOAuthPrincipal(twitter4j.User twitterUser, TwitterAccessTokenContext accessToken,
                                                                     OAuthProviderTypeRegistry registry) {
         String fullName = twitterUser.getName();
         String firstName;
@@ -75,17 +74,17 @@ public class OAuthUtils {
             lastName = null;
         }
 
-        return new OAuthPrincipal(twitterUser.getScreenName(), firstName, lastName, fullName, null, accessTokenString,
+        return new OAuthPrincipal<TwitterAccessTokenContext>(twitterUser.getScreenName(), firstName, lastName, fullName, null, accessToken,
                 registry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_TWITTER));
     }
 
-    public static OAuthPrincipal convertGoogleInfoToOAuthPrincipal(Userinfo userInfo, String accessTokenString,
+    public static OAuthPrincipal<GoogleTokenResponse> convertGoogleInfoToOAuthPrincipal(Userinfo userInfo, GoogleTokenResponse accessToken,
                                                                    OAuthProviderTypeRegistry registry) {
         // Assume that username is first part of email
         String email = userInfo.getEmail();
         String username = email.substring(0, email.indexOf('@'));
-        return new OAuthPrincipal(username, userInfo.getGivenName(), userInfo.getFamilyName(), userInfo.getName(), userInfo.getEmail(),
-                accessTokenString, registry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_GOOGLE));
+        return new OAuthPrincipal<GoogleTokenResponse>(username, userInfo.getGivenName(), userInfo.getFamilyName(), userInfo.getName(), userInfo.getEmail(),
+                accessToken, registry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_GOOGLE));
     }
 
     public static User convertOAuthPrincipalToGateInUser(OAuthPrincipal principal) {

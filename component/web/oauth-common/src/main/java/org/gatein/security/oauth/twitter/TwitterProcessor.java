@@ -37,14 +37,10 @@ import twitter4j.auth.AccessToken;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public interface TwitterProcessor {
+public interface TwitterProcessor extends OAuthProviderProcessor<TwitterAccessTokenContext> {
 
     TwitterInteractionState processTwitterAuthInteraction(HttpServletRequest request, HttpServletResponse response) throws
             IOException, GateInException;
-
-    String getStringFromAccessToken(AccessToken accessToken);
-
-    TwitterAccessTokenContext getAccessTokenFromString(String accessTokenString);
 
     Twitter getAuthorizedTwitterInstance(TwitterAccessTokenContext accessTokenContext);
 }

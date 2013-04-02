@@ -93,7 +93,7 @@ public class FacebookFilter extends AbstractSSOInterceptor {
                     log.trace("Facebook accessToken: " + principal.getAccessToken());
                 }
 
-                OAuthPrincipal oauthPrincipal = OAuthUtils.convertFacebookPrincipalToOAuthPrincipal(principal, oAuthProviderTypeRegistry);
+                OAuthPrincipal<String> oauthPrincipal = OAuthUtils.convertFacebookPrincipalToOAuthPrincipal(principal, oAuthProviderTypeRegistry);
 
                 // Remove attribute with state of facebookLogin
                 httpRequest.getSession().removeAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE);

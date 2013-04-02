@@ -30,9 +30,17 @@ import org.exoplatform.services.organization.UserProfile;
  */
 public interface OAuthProviderProcessor<T> {
 
-    void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, T accessToken);
+    void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, T accessToken);
 
-    T getAccessTokenFromUserProfile(UserProfile userProfile);
+    /**
+     *
+     * @param userProfile
+     * @param codec
+     * @return null if accessToken is not found in persistent storage
+     */
+    T getAccessTokenFromUserProfile(UserProfile userProfile, OAuthCodec codec);
 
-    // TODO: revoke token
+    void removeAccessTokenFromUserProfile(UserProfile userProfile);
+
+    void revokeToken(T accessToken);
 }

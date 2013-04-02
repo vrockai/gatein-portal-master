@@ -37,6 +37,7 @@ import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.common.OAuthCodec;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.social.FacebookPrincipal;
 import org.gatein.security.oauth.social.FacebookProcessor;
@@ -121,5 +122,28 @@ public class GateInFacebookProcessorImpl implements GateInFacebookProcessor {
     @Override
     public FacebookPrincipal getPrincipal(String accessToken) {
         return (FacebookPrincipal)facebookProcessor.readInIdentity(accessToken);
+    }
+
+    @Override
+    public void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, String accessToken) {
+        String encodedAccessToken = codec.encodeString(accessToken);
+        userProfile.setAttribute(OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN, encodedAccessToken);
+    }
+
+    @Override
+    public String getAccessTokenFromUserProfile(UserProfile userProfile, OAuthCodec codec) {
+        String encodedAccessToken = userProfile.getAttribute(OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN);
+        return codec.decodeString(encodedAccessToken);
+    }
+
+    @Override
+    public void removeAccessTokenFromUserProfile(UserProfile userProfile) {
+        userProfile.setAttribute(OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN, null);
+    }
+
+    @Override
+    public void revokeToken(String accessToken) {
+        // TODO: implement
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

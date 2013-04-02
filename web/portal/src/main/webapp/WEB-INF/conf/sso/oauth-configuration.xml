@@ -280,7 +280,7 @@
         </value-param>
         <value-param>
           <name>oauthProviderProcessorClass</name>
-          <value>user.social-info.facebook.accessToken</value>
+          <value>org.gatein.security.oauth.facebook.GateInFacebookProcessor</value>
         </value-param>
         <value-param>
           <name>initOAuthURL</name>
@@ -315,7 +315,7 @@
         </value-param>
         <value-param>
           <name>oauthProviderProcessorClass</name>
-          <value>user.social-info.twitter.accessToken</value>
+          <value>org.gatein.security.oauth.twitter.TwitterProcessor</value>
         </value-param>
         <value-param>
           <name>initOAuthURL</name>
@@ -350,7 +350,7 @@
         </value-param>
         <value-param>
           <name>oauthProviderProcessorClass</name>
-          <value>user.social-info.google.accessToken</value>
+          <value>org.gatein.security.oauth.google.GoogleProcessor</value>
         </value-param>
         <value-param>
           <name>initOAuthURL</name>

@@ -30,6 +30,8 @@ import org.exoplatform.services.organization.UserProfileEventListener;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
+import org.gatein.security.oauth.common.OAuthCodec;
+import org.gatein.security.oauth.common.OAuthProviderProcessor;
 import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 
@@ -42,10 +44,12 @@ public class AccessTokenInvalidationListener extends UserProfileEventListener {
 
     private final UserProfileHandler userProfileHandler;
     private final OAuthProviderTypeRegistry oauthProviderTypeRegistry;
+    private final OAuthCodec oauthCodec; // actually SocialNetworkServiceImpl
 
-    public AccessTokenInvalidationListener(OrganizationService orgService, OAuthProviderTypeRegistry oauthProviderTypeRegistry) {
+    public AccessTokenInvalidationListener(OrganizationService orgService, OAuthProviderTypeRegistry oauthProviderTypeRegistry, OAuthCodec oauthCodec) {
         this.userProfileHandler = orgService.getUserProfileHandler();
         this.oauthProviderTypeRegistry = oauthProviderTypeRegistry;
+        this.oauthCodec = oauthCodec;
     }
 
     @Override
@@ -58,15 +62,16 @@ public class AccessTokenInvalidationListener extends UserProfileEventListener {
 
             // This means that oauthUsername has been changed. We may need to invalidate current accessToken as well
             if (!Safe.equals(oauthProviderUsername, foundOauthProviderUsername)) {
-                String currentAccessToken = userProfile.getAttribute(opt.getAccessTokenAttrName());
-                String foundAccessToken = foundUserProfile.getAttribute(opt.getAccessTokenAttrName());
+                OAuthProviderProcessor processor = opt.getOauthProviderProcessor();
+                Object currentAccessToken = processor.getAccessTokenFromUserProfile(userProfile, oauthCodec);
+                Object foundAccessToken = processor.getAccessTokenFromUserProfile(foundUserProfile, oauthCodec);
 
                 // In this case, we need to remove existing accessToken
                 if (currentAccessToken != null && currentAccessToken.equals(foundAccessToken)) {
                     if (log.isTraceEnabled()) {
                         log.trace("Removing accessToken for oauthProvider=" + opt + ", username=" + userProfile.getUserName());
                     }
-                    userProfile.setAttribute(opt.getAccessTokenAttrName(), null);
+                    processor.removeAccessTokenFromUserProfile(userProfile);
                 }
             }
         }

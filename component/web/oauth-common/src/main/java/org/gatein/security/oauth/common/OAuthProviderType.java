@@ -26,20 +26,20 @@ package org.gatein.security.oauth.common;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class OAuthProviderType {
+public class OAuthProviderType<T> {
 
     private final String key;
     private final boolean enabled;
     private final String userNameAttrName;
-    private final String accessTokenAttrName;
+    private final OAuthProviderProcessor<T> oauthProviderProcessor;
     private final String initOAuthURL;
     private final String friendlyName;
 
-    public OAuthProviderType(String key, boolean enabled, String userNameAttrName, String accessTokenAttrName, String initOAuthURL, String friendlyName) {
+    public OAuthProviderType(String key, boolean enabled, String userNameAttrName, OAuthProviderProcessor<T> oauthProviderProcessor, String initOAuthURL, String friendlyName) {
         this.key = key;
         this.enabled = enabled;
         this.userNameAttrName = userNameAttrName;
-        this.accessTokenAttrName = accessTokenAttrName;
+        this.oauthProviderProcessor = oauthProviderProcessor;
         this.initOAuthURL = initOAuthURL;
         this.friendlyName = friendlyName;
     }
@@ -56,8 +56,8 @@ public class OAuthProviderType {
         return userNameAttrName;
     }
 
-    public String getAccessTokenAttrName() {
-        return accessTokenAttrName;
+    public OAuthProviderProcessor<T> getOauthProviderProcessor() {
+        return oauthProviderProcessor;
     }
 
     public String getInitOAuthURL(String contextPath) {
@@ -74,7 +74,7 @@ public class OAuthProviderType {
                 .append("key=" + key)
                 .append(", enabled=" + enabled)
                 .append(", userNameAttrName=" + userNameAttrName)
-                .append(", oauthProviderClass=" + accessTokenAttrName)
+                .append(", oauthProviderProcessor=" + oauthProviderProcessor)
                 .append(", initOAuthURL=" + initOAuthURL)
                 .append(", friendlyName=" + friendlyName)
                 .append(" ]").toString();

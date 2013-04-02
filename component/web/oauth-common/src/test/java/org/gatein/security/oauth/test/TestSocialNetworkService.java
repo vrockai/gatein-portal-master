@@ -27,6 +27,7 @@ import java.io.File;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.component.test.AbstractKernelTest;
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -45,6 +46,7 @@ import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.data.SocialNetworkService;
 import org.gatein.common.exception.GateInException;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
+import org.gatein.security.oauth.twitter.TwitterAccessTokenContext;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -146,26 +148,49 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         orgService.getUserHandler().createUser(user1, false);
         orgService.getUserHandler().createUser(user2, false);
 
-        // Update some accessTokens
+        // Update some facebook accessTokens
         socialNetworkService.updateOAuthAccessToken(getFacebookProvider(), user1.getUserName(), "aaa123");
         socialNetworkService.updateOAuthAccessToken(getFacebookProvider(), user2.getUserName(), "bbb456");
-        socialNetworkService.updateOAuthAccessToken(getGoogleProvider(), user1.getUserName(), "ccc789");
 
-        // Verify that accessTokens could be obtained
+        // Update some google accessToken
+        GoogleTokenResponse grc = createGoogleTokenResponse("ccc789", "id123", "rfrc487", "http://someScope");
+        socialNetworkService.updateOAuthAccessToken(getGoogleProvider(), user1.getUserName(), grc);
+
+        // Update some twitter accessToken
+        TwitterAccessTokenContext twitterToken = new TwitterAccessTokenContext("tok1", "secret1");
+        socialNetworkService.updateOAuthAccessToken(getTwitterProvider(), user1.getUserName(), twitterToken);
+
+        // Verify that FB accessTokens could be obtained
         assertEquals("aaa123", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
         assertEquals("bbb456", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user2.getUserName()));
-        assertEquals("ccc789", socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user1.getUserName()));
+
+        // Verify that Google accessToken could be obtained
+        grc = createGoogleTokenResponse("ccc789", "id123", "rfrc487", "http://someScope");
+        assertEquals(grc, socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user1.getUserName()));
         assertNull(socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user2.getUserName()));
+
+        // Verify that twitter accessToken could be obtained
+        assertEquals(new TwitterAccessTokenContext("tok1", "secret1"), socialNetworkService.getOAuthAccessToken(getTwitterProvider(), user1.getUserName()));
+        assertNull(socialNetworkService.getOAuthAccessToken(getTwitterProvider(), user2.getUserName()));
 
         // Directly obtain accessTokens from userProfile and verify that they are encoded
         UserProfile userProfile1 = orgService.getUserProfileHandler().findUserProfileByName("testUser1");
         UserProfile userProfile2 = orgService.getUserProfileHandler().findUserProfileByName("testUser2");
-        String encodedAccessToken1 = userProfile1.getAttribute(getFacebookProvider().getAccessTokenAttrName());
-        String encodedAccessToken2 = userProfile2.getAttribute(getFacebookProvider().getAccessTokenAttrName());
+        String encodedAccessToken1 = userProfile1.getAttribute(OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN);
+        String encodedAccessToken2 = userProfile2.getAttribute(OAuthConstants.PROFILE_FACEBOOK_ACCESS_TOKEN);
         assertFalse("aaa123".equals(encodedAccessToken1));
         assertFalse("bbb456".equals(encodedAccessToken2));
         assertTrue(codec.encode("aaa123").equals(encodedAccessToken1));
         assertTrue(codec.encode("bbb456").equals(encodedAccessToken2));
+
+        // Verify that tokens are null after invalidation
+        socialNetworkService.removeOAuthAccessToken(getFacebookProvider(), user1.getUserName());
+        socialNetworkService.removeOAuthAccessToken(getGoogleProvider(), user1.getUserName());
+        socialNetworkService.removeOAuthAccessToken(getTwitterProvider(), user1.getUserName());
+        assertNull(socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
+        assertNull(socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user1.getUserName()));
+        assertNull(socialNetworkService.getOAuthAccessToken(getTwitterProvider(), user1.getUserName()));
+        assertNotNull(socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user2.getUserName()));
     }
 
     public void testInvalidationOfAccessTokens() throws Exception {
@@ -195,14 +220,47 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         userProfile1.setAttribute(getFacebookProvider().getUserNameAttrName(), null);
         orgService.getUserProfileHandler().saveUserProfile(userProfile1, true);
         assertNull(socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
+
+        // Test this with Twitter
+        TwitterAccessTokenContext twitterToken = new TwitterAccessTokenContext("token1", "secret1");
+        socialNetworkService.updateOAuthInfo(getTwitterProvider(), user1.getUserName(), "twitterUsername1", twitterToken);
+
+        userProfile1 = orgService.getUserProfileHandler().findUserProfileByName(user1.getUserName());
+        userProfile1.setAttribute(getTwitterProvider().getUserNameAttrName(), "twitterUsername2");
+        orgService.getUserProfileHandler().saveUserProfile(userProfile1, true);
+        assertNull(socialNetworkService.getOAuthAccessToken(getTwitterProvider(), user1.getUserName()));
+
+        // Test this with Google
+        GoogleTokenResponse grc = createGoogleTokenResponse("token1", "id1", "rf1", "http://someScope");
+        socialNetworkService.updateOAuthInfo(getGoogleProvider(), user1.getUserName(), "googleUsername1", grc);
+
+        userProfile1 = orgService.getUserProfileHandler().findUserProfileByName(user1.getUserName());
+        userProfile1.setAttribute(getGoogleProvider().getUserNameAttrName(), "googleUsername2");
+        orgService.getUserProfileHandler().saveUserProfile(userProfile1, true);
+        assertNull(socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user1.getUserName()));
     }
 
-    private OAuthProviderType getFacebookProvider() {
+    private OAuthProviderType<String> getFacebookProvider() {
         return oAuthProviderTypeRegistry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_FACEBOOK);
     }
 
-    private OAuthProviderType getGoogleProvider() {
+    private OAuthProviderType<GoogleTokenResponse> getGoogleProvider() {
         return oAuthProviderTypeRegistry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_GOOGLE);
+    }
+
+    private OAuthProviderType<TwitterAccessTokenContext> getTwitterProvider() {
+        return oAuthProviderTypeRegistry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_TWITTER);
+    }
+
+    private GoogleTokenResponse createGoogleTokenResponse(String accessToken, String idToken, String refreshToken, String scope) {
+        GoogleTokenResponse grc = new GoogleTokenResponse();
+        grc.setAccessToken(accessToken);
+        grc.setIdToken(idToken);
+        grc.setRefreshToken(refreshToken);
+        grc.setScope(scope);
+        grc.setExpiresInSeconds(1000L);
+        grc.setTokenType("Bearer");
+        return grc;
     }
 
 }
