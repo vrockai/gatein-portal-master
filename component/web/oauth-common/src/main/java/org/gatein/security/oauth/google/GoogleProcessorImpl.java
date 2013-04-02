@@ -263,11 +263,9 @@ public class GoogleProcessorImpl implements GoogleProcessor {
     @Override
     public void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, OAuthCodec codec, GoogleTokenResponse accessToken) {
         String encodedAccessToken = codec.encodeString(accessToken.getAccessToken());
-        String encodedIdToken = codec.encodeString(accessToken.getIdToken());
         String encodedRefreshToken = codec.encodeString(accessToken.getRefreshToken());
         String encodedScope = codec.encodeString(accessToken.getScope());
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN, encodedAccessToken);
-        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ID_TOKEN, encodedIdToken);
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN, encodedRefreshToken);
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_SCOPE, encodedScope);
     }
@@ -281,23 +279,21 @@ public class GoogleProcessorImpl implements GoogleProcessor {
             return null;
         }
 
-        String decodedIdToken = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_GOOGLE_ID_TOKEN));
         String decodedRefreshToken = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN));
         String decodedScope = codec.decodeString(userProfile.getAttribute(OAuthConstants.PROFILE_GOOGLE_SCOPE));
         GoogleTokenResponse grc = new GoogleTokenResponse();
         grc.setAccessToken(decodedAccessToken);
-        grc.setIdToken(decodedIdToken);
         grc.setRefreshToken(decodedRefreshToken);
         grc.setScope(decodedScope);
         grc.setTokenType("Bearer");
         grc.setExpiresInSeconds(1000L);
+        grc.setIdToken("someTokenId");
         return grc;
     }
 
     @Override
     public void removeAccessTokenFromUserProfile(UserProfile userProfile) {
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN, null);
-        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ID_TOKEN, null);
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN, null);
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_SCOPE, null);
     }

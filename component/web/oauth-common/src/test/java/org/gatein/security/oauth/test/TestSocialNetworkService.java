@@ -153,7 +153,7 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         socialNetworkService.updateOAuthAccessToken(getFacebookProvider(), user2.getUserName(), "bbb456");
 
         // Update some google accessToken
-        GoogleTokenResponse grc = createGoogleTokenResponse("ccc789", "id123", "rfrc487", "http://someScope");
+        GoogleTokenResponse grc = createGoogleTokenResponse("ccc789", "rfrc487", "http://someScope");
         socialNetworkService.updateOAuthAccessToken(getGoogleProvider(), user1.getUserName(), grc);
 
         // Update some twitter accessToken
@@ -165,7 +165,7 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         assertEquals("bbb456", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user2.getUserName()));
 
         // Verify that Google accessToken could be obtained
-        grc = createGoogleTokenResponse("ccc789", "id123", "rfrc487", "http://someScope");
+        grc = createGoogleTokenResponse("ccc789", "rfrc487", "http://someScope");
         assertEquals(grc, socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user1.getUserName()));
         assertNull(socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user2.getUserName()));
 
@@ -231,7 +231,7 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         assertNull(socialNetworkService.getOAuthAccessToken(getTwitterProvider(), user1.getUserName()));
 
         // Test this with Google
-        GoogleTokenResponse grc = createGoogleTokenResponse("token1", "id1", "rf1", "http://someScope");
+        GoogleTokenResponse grc = createGoogleTokenResponse("token1", "rf1", "http://someScope");
         socialNetworkService.updateOAuthInfo(getGoogleProvider(), user1.getUserName(), "googleUsername1", grc);
 
         userProfile1 = orgService.getUserProfileHandler().findUserProfileByName(user1.getUserName());
@@ -252,14 +252,14 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         return oAuthProviderTypeRegistry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_TWITTER);
     }
 
-    private GoogleTokenResponse createGoogleTokenResponse(String accessToken, String idToken, String refreshToken, String scope) {
+    private GoogleTokenResponse createGoogleTokenResponse(String accessToken, String refreshToken, String scope) {
         GoogleTokenResponse grc = new GoogleTokenResponse();
         grc.setAccessToken(accessToken);
-        grc.setIdToken(idToken);
         grc.setRefreshToken(refreshToken);
         grc.setScope(scope);
         grc.setExpiresInSeconds(1000L);
         grc.setTokenType("Bearer");
+        grc.setIdToken("someTokenId");
         return grc;
     }
 
