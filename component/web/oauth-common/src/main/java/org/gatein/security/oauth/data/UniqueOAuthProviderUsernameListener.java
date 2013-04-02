@@ -32,6 +32,7 @@ import org.exoplatform.services.organization.UserProfileEventListener;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.common.OAuthProviderType;
+import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -39,14 +40,16 @@ import org.gatein.security.oauth.common.OAuthProviderType;
 public class UniqueOAuthProviderUsernameListener extends UserProfileEventListener {
 
     private final SocialNetworkService socialNetworkService;
+    private final OAuthProviderTypeRegistry oauthProviderTypeRegistry;
 
-    public UniqueOAuthProviderUsernameListener(SocialNetworkService socialNetworkService) {
+    public UniqueOAuthProviderUsernameListener(SocialNetworkService socialNetworkService, OAuthProviderTypeRegistry oauthProviderTypeRegistry) {
         this.socialNetworkService = socialNetworkService;
+        this.oauthProviderTypeRegistry = oauthProviderTypeRegistry;
     }
 
     @Override
     public void preSave(UserProfile user, boolean isNew) throws Exception {
-        for (OAuthProviderType opt : OAuthProviderType.values()) {
+        for (OAuthProviderType opt : oauthProviderTypeRegistry.getEnabledOAuthProviders()) {
             String oauthProviderUsername = user.getAttribute(opt.getUserNameAttrName());
 
             if (oauthProviderUsername == null) {

@@ -32,6 +32,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfo;
 import com.google.api.services.plus.Plus;
+import org.gatein.security.oauth.common.OAuthProviderProcessor;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

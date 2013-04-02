@@ -72,7 +72,7 @@ public class OAuthAuthenticationFilter extends AbstractSSOInterceptor {
         String attachUsernamePasswordToLoginURLConfig = getInitParameter("attachUsernamePasswordToLoginURL");
         this.attachUsernamePasswordToLoginURL = attachUsernamePasswordToLoginURLConfig == null ? true : Boolean.parseBoolean(attachUsernamePasswordToLoginURLConfig);
 
-        log.info("OAuthAuthenticationFilter configuration: loginURL=" + loginUrl +
+        log.debug("OAuthAuthenticationFilter configuration: loginURL=" + loginUrl +
                 ", registrationUrl=" + this.registrationUrl +
                 ", attachUsernamePasswordToLoginURL=" + this.attachUsernamePasswordToLoginURL);
 

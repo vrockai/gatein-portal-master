@@ -23,6 +23,7 @@
 
 package org.exoplatform.portal.account;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +55,8 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthConstants;
+import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
+import thredds.inventory.CollectionManager;
 
 /**
  * Social networks tab of user profile
@@ -76,9 +79,9 @@ public class UIAccountSocial extends UIForm {
         updateUIFields();
     }
 
-    public OAuthProviderType[] getOAuthProviderTypes() {
+    public Collection<OAuthProviderType> getOAuthProviderTypes() {
         // For now return all available oauthProviderTypes
-        return OAuthProviderType.values();
+        return getApplicationComponent(OAuthProviderTypeRegistry.class).getEnabledOAuthProviders();
     }
 
     @Override

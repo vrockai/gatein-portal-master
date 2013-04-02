@@ -32,6 +32,7 @@ import javax.servlet.http.HttpSession;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.organization.UserProfile;
 import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;

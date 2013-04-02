@@ -31,6 +31,7 @@ import org.exoplatform.services.organization.UserProfileHandler;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthProviderType;
+import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -40,16 +41,18 @@ public class AccessTokenInvalidationListener extends UserProfileEventListener {
     private static Logger log = LoggerFactory.getLogger(AccessTokenInvalidationListener.class);
 
     private final UserProfileHandler userProfileHandler;
+    private final OAuthProviderTypeRegistry oauthProviderTypeRegistry;
 
-    public AccessTokenInvalidationListener(OrganizationService orgService) {
+    public AccessTokenInvalidationListener(OrganizationService orgService, OAuthProviderTypeRegistry oauthProviderTypeRegistry) {
         this.userProfileHandler = orgService.getUserProfileHandler();
+        this.oauthProviderTypeRegistry = oauthProviderTypeRegistry;
     }
 
     @Override
     public void preSave(UserProfile userProfile, boolean isNew) throws Exception {
         UserProfile foundUserProfile = userProfileHandler.findUserProfileByName(userProfile.getUserName());
 
-        for (OAuthProviderType opt : OAuthProviderType.values()) {
+        for (OAuthProviderType opt : oauthProviderTypeRegistry.getEnabledOAuthProviders()) {
             String oauthProviderUsername = userProfile.getAttribute(opt.getUserNameAttrName());
             String foundOauthProviderUsername = foundUserProfile.getAttribute(opt.getUserNameAttrName());
 

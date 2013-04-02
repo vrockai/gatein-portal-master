@@ -77,6 +77,13 @@ public class OAuthConstants {
 
     public static final String PROPERTY_TWITTER_REDIRECT_URL = "gatein.oauth.twitter.redirectURL";
 
+    // Key of OAuthProviders
+
+    public static final String OAUTH_PROVIDER_KEY_FACEBOOK = "FACEBOOK";
+
+    public static final String OAUTH_PROVIDER_KEY_TWITTER = "TWITTER";
+
+    public static final String OAUTH_PROVIDER_KEY_GOOGLE = "GOOGLE";
 
     // User profile attributes
 

@@ -44,6 +44,7 @@ import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.data.SocialNetworkService;
 import org.gatein.common.exception.GateInException;
+import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -55,6 +56,7 @@ public class TestSocialNetworkService extends AbstractKernelTest {
 
     private OrganizationService orgService;
     private SocialNetworkService socialNetworkService;
+    private OAuthProviderTypeRegistry oAuthProviderTypeRegistry;
     private AbstractCodec codec;
 
     @Override
@@ -75,6 +77,7 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         PortalContainer portalContainer = PortalContainer.getInstance();
         orgService = (OrganizationService) portalContainer.getComponentInstanceOfType(OrganizationService.class);
         socialNetworkService = (SocialNetworkService) portalContainer.getComponentInstanceOfType(SocialNetworkService.class);
+        oAuthProviderTypeRegistry = (OAuthProviderTypeRegistry) portalContainer.getComponentInstanceOfType(OAuthProviderTypeRegistry.class);
         CodecInitializer codecInitializer = (CodecInitializer) portalContainer.getComponentInstanceOfType(CodecInitializer.class);
         this.codec = codecInitializer.initCodec();
         begin();
@@ -104,28 +107,28 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         orgService.getUserProfileHandler().saveUserProfile(userProfile2, true);
 
         // Find user by facebook and google username
-        User foundUser = socialNetworkService.findUserByOAuthProviderUsername(OAuthProviderType.FACEBOOK, "joseph.doyle");
+        User foundUser = socialNetworkService.findUserByOAuthProviderUsername(getFacebookProvider(), "joseph.doyle");
         assertNotNull(foundUser);
         assertEquals(foundUser.getUserName(), user1.getUserName());
 
-        User foundUser2 = socialNetworkService.findUserByOAuthProviderUsername(OAuthProviderType.FACEBOOK, "john.doyle");
+        User foundUser2 = socialNetworkService.findUserByOAuthProviderUsername(getFacebookProvider(), "john.doyle");
         assertNotNull(foundUser2);
         assertEquals(foundUser2.getUserName(), user2.getUserName());
 
-        User foundUser3 = socialNetworkService.findUserByOAuthProviderUsername(OAuthProviderType.GOOGLE, "john.something");
+        User foundUser3 = socialNetworkService.findUserByOAuthProviderUsername(getGoogleProvider(), "john.something");
         assertNotNull(foundUser3);
         assertEquals(foundUser3.getUserName(), user2.getUserName());
 
         // Try to change facebook username for user1 with socialNetworkService
-        socialNetworkService.updateOAuthInfo(OAuthProviderType.FACEBOOK, user1.getUserName(), "joseph.doyle.changed", "someToken");
+        socialNetworkService.updateOAuthInfo(getFacebookProvider(), user1.getUserName(), "joseph.doyle.changed", "someToken");
 
-        User foundUser4 = socialNetworkService.findUserByOAuthProviderUsername(OAuthProviderType.FACEBOOK, "joseph.doyle.changed");
+        User foundUser4 = socialNetworkService.findUserByOAuthProviderUsername(getFacebookProvider(), "joseph.doyle.changed");
         assertNotNull(foundUser4);
         assertEquals(foundUser4.getUserName(), user1.getUserName());
 
         try {
             // This should fail because of duplicated facebook username
-            socialNetworkService.updateOAuthInfo(OAuthProviderType.FACEBOOK, user2.getUserName(), "joseph.doyle.changed", "someToken");
+            socialNetworkService.updateOAuthInfo(getFacebookProvider(), user2.getUserName(), "joseph.doyle.changed", "someToken");
 
             fail("Exception should occur because of duplicated facebook username");
         } catch (GateInException gtnOauthException) {
@@ -144,21 +147,21 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         orgService.getUserHandler().createUser(user2, false);
 
         // Update some accessTokens
-        socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName(), "aaa123");
-        socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, user2.getUserName(), "bbb456");
-        socialNetworkService.updateOAuthAccessToken(OAuthProviderType.GOOGLE, user1.getUserName(), "ccc789");
+        socialNetworkService.updateOAuthAccessToken(getFacebookProvider(), user1.getUserName(), "aaa123");
+        socialNetworkService.updateOAuthAccessToken(getFacebookProvider(), user2.getUserName(), "bbb456");
+        socialNetworkService.updateOAuthAccessToken(getGoogleProvider(), user1.getUserName(), "ccc789");
 
         // Verify that accessTokens could be obtained
-        assertEquals("aaa123", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
-        assertEquals("bbb456", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user2.getUserName()));
-        assertEquals("ccc789", socialNetworkService.getOAuthAccessToken(OAuthProviderType.GOOGLE, user1.getUserName()));
-        assertNull(socialNetworkService.getOAuthAccessToken(OAuthProviderType.GOOGLE, user2.getUserName()));
+        assertEquals("aaa123", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
+        assertEquals("bbb456", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user2.getUserName()));
+        assertEquals("ccc789", socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user1.getUserName()));
+        assertNull(socialNetworkService.getOAuthAccessToken(getGoogleProvider(), user2.getUserName()));
 
         // Directly obtain accessTokens from userProfile and verify that they are encoded
         UserProfile userProfile1 = orgService.getUserProfileHandler().findUserProfileByName("testUser1");
         UserProfile userProfile2 = orgService.getUserProfileHandler().findUserProfileByName("testUser2");
-        String encodedAccessToken1 = userProfile1.getAttribute(OAuthProviderType.FACEBOOK.getAccessTokenAttrName());
-        String encodedAccessToken2 = userProfile2.getAttribute(OAuthProviderType.FACEBOOK.getAccessTokenAttrName());
+        String encodedAccessToken1 = userProfile1.getAttribute(getFacebookProvider().getAccessTokenAttrName());
+        String encodedAccessToken2 = userProfile2.getAttribute(getFacebookProvider().getAccessTokenAttrName());
         assertFalse("aaa123".equals(encodedAccessToken1));
         assertFalse("bbb456".equals(encodedAccessToken2));
         assertTrue(codec.encode("aaa123").equals(encodedAccessToken1));
@@ -170,28 +173,36 @@ public class TestSocialNetworkService extends AbstractKernelTest {
         orgService.getUserHandler().createUser(user1, false);
 
         // Update some accessToken and verify that it's available
-        socialNetworkService.updateOAuthInfo(OAuthProviderType.FACEBOOK, user1.getUserName(), "fbUsername1", "fbAccessToken1");
-        assertEquals("fbAccessToken1", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+        socialNetworkService.updateOAuthInfo(getFacebookProvider(), user1.getUserName(), "fbUsername1", "fbAccessToken1");
+        assertEquals("fbAccessToken1", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
 
         // Update some accessToken again
-        socialNetworkService.updateOAuthInfo(OAuthProviderType.FACEBOOK, user1.getUserName(), "fbUsername1", "fbAccessToken2");
-        assertEquals("fbAccessToken2", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+        socialNetworkService.updateOAuthInfo(getFacebookProvider(), user1.getUserName(), "fbUsername1", "fbAccessToken2");
+        assertEquals("fbAccessToken2", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
 
         // Update userProfile and change FB username. AccessToken should be invalidated
         UserProfile userProfile1 = orgService.getUserProfileHandler().findUserProfileByName(user1.getUserName());
-        userProfile1.setAttribute(OAuthProviderType.FACEBOOK.getUserNameAttrName(), "fbUsername2");
+        userProfile1.setAttribute(getFacebookProvider().getUserNameAttrName(), "fbUsername2");
         orgService.getUserProfileHandler().saveUserProfile(userProfile1, true);
-        assertNull(socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+        assertNull(socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
 
         // Update some accessToken and verify it's here now
-        socialNetworkService.updateOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName(), "fbAccessToken3");
-        assertEquals("fbAccessToken3", socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+        socialNetworkService.updateOAuthAccessToken(getFacebookProvider(), user1.getUserName(), "fbAccessToken3");
+        assertEquals("fbAccessToken3", socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
 
         // Null FB username and verify that accessToken is invalidated
         userProfile1 = orgService.getUserProfileHandler().findUserProfileByName(user1.getUserName());
-        userProfile1.setAttribute(OAuthProviderType.FACEBOOK.getUserNameAttrName(), null);
+        userProfile1.setAttribute(getFacebookProvider().getUserNameAttrName(), null);
         orgService.getUserProfileHandler().saveUserProfile(userProfile1, true);
-        assertNull(socialNetworkService.getOAuthAccessToken(OAuthProviderType.FACEBOOK, user1.getUserName()));
+        assertNull(socialNetworkService.getOAuthAccessToken(getFacebookProvider(), user1.getUserName()));
+    }
+
+    private OAuthProviderType getFacebookProvider() {
+        return oAuthProviderTypeRegistry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_FACEBOOK);
+    }
+
+    private OAuthProviderType getGoogleProvider() {
+        return oAuthProviderTypeRegistry.getOAuthProvider(OAuthConstants.OAUTH_PROVIDER_KEY_GOOGLE);
     }
 
 }

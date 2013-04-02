@@ -1,5 +1,6 @@
 <%
   import org.gatein.security.oauth.common.OAuthProviderType;
+  import java.util.Collection;
   String fieldName;
 %>
 <div class="UIForm $uicomponent.id">
@@ -8,7 +9,11 @@
 		<div class="FormContainer">
 			<table class="UIFormGrid">
 				<%
-					for(OAuthProviderType oauthPrType : uicomponent.getOAuthProviderTypes()) {
+				   Collection<OAuthProviderType> oauthProviders = uicomponent.getOAuthProviderTypes();
+				   if (oauthProviders.size() == 0) {
+				   	%> <tr><td>No Social networks available</td></tr> <%
+				   } else {
+					  for(OAuthProviderType oauthPrType : oauthProviders) {
 					    field = uicomponent.getUIStringInput(oauthPrType.getUserNameAttrName());
 						if(field.isRendered()) {
 				%>
@@ -42,7 +47,8 @@
 							</tr>
 				<%
 						}
-					}
+					 }
+				   }
 				%>
 			</table>
 		</div>

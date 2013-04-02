@@ -37,6 +37,7 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.common.OAuthPrincipal;
+import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 import org.gatein.security.oauth.twitter.TwitterInteractionState;
 import org.gatein.security.oauth.twitter.TwitterProcessor;
 import org.gatein.security.oauth.utils.OAuthUtils;
@@ -53,11 +54,13 @@ public class TwitterFilter extends AbstractSSOInterceptor {
 
     private AuthenticationRegistry authenticationRegistry;
     private TwitterProcessor twitterProcessor;
+    private OAuthProviderTypeRegistry oAuthProviderTypeRegistry;
 
     @Override
     protected void initImpl() {
         authenticationRegistry = (AuthenticationRegistry)getExoContainer().getComponentInstanceOfType(AuthenticationRegistry.class);
         twitterProcessor = (TwitterProcessor)getExoContainer().getComponentInstanceOfType(TwitterProcessor.class);
+        oAuthProviderTypeRegistry = (OAuthProviderTypeRegistry)getExoContainer().getComponentInstanceOfType(OAuthProviderTypeRegistry.class);
     }
 
     @Override
@@ -88,7 +91,7 @@ public class TwitterFilter extends AbstractSSOInterceptor {
                 // We need to convert accessToken to string before save it to DB
                 String accessTokenString = twitterProcessor.getStringFromAccessToken(accessToken);
 
-                OAuthPrincipal oauthPrincipal = OAuthUtils.convertTwitterUserToOAuthPrincipal(twitterUser, accessTokenString);
+                OAuthPrincipal oauthPrincipal = OAuthUtils.convertTwitterUserToOAuthPrincipal(twitterUser, accessTokenString, oAuthProviderTypeRegistry);
 
                 if (httpRequest.getRemoteUser() == null) {
                     // Save authenticated OAuthPrincipal to authenticationRegistry in case that we are anonymous user

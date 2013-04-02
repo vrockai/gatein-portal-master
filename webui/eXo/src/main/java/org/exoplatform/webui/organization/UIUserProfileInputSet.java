@@ -54,6 +54,7 @@ import org.gatein.common.exception.GateInException;
 import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.common.OAuthProviderType;
+import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 
 /**
  * Created by The eXo Platform SARL Author : Dang Van Minh minhdv81@yahoo.com Jun 28, 2006
@@ -190,7 +191,8 @@ public class UIUserProfileInputSet extends UIFormInputSet {
 
     private String[] getSocialInfoKeys() {
         List<String> result = new ArrayList<String>();
-        for (OAuthProviderType oauthProvType : OAuthProviderType.values()) {
+        OAuthProviderTypeRegistry registry = getApplicationComponent(OAuthProviderTypeRegistry.class);
+        for (OAuthProviderType oauthProvType : registry.getEnabledOAuthProviders()) {
             String oauthUsernameAttrName = oauthProvType.getUserNameAttrName();
             result.add(oauthUsernameAttrName);
         }

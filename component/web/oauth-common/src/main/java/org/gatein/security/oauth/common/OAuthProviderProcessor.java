@@ -21,29 +21,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.security.oauth.webapi;
+package org.gatein.security.oauth.common;
 
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.xml.InitParams;
-import org.gatein.security.oauth.common.OAuthProviderType;
+import org.exoplatform.services.organization.UserProfile;
 
 /**
- * {@link OAuthFilterIntegrator}, which is always enabled if at least one {@link OAuthProviderType} is enabled
- *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class CustomOAuthFilterIntegratorPlugin extends OAuthFilterIntegratorPlugin {
+public interface OAuthProviderProcessor<T> {
 
-    public CustomOAuthFilterIntegratorPlugin(InitParams params, ExoContainerContext containerContext) {
-        super(params, containerContext);
-    }
+    void saveAccessTokenAttributesToUserProfile(UserProfile userProfile, T accessToken);
 
-    /**
-     *
-     * @return true if at least one {@link org.gatein.security.oauth.common.OAuthProviderType} is enabled
-     */
-    @Override
-    public boolean isEnabled() {
-        return OAuthProviderType.isOAuthEnabled();
-    }
+    T getAccessTokenFromUserProfile(UserProfile userProfile);
+
+    // TODO: revoke token
 }

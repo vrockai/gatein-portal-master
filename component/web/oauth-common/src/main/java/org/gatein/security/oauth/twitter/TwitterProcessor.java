@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.gatein.common.exception.GateInException;
+import org.gatein.security.oauth.common.OAuthProviderProcessor;
 import twitter4j.Twitter;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;

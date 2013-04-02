@@ -31,6 +31,11 @@
   </component>
 
   <component>
+    <key>org.gatein.security.oauth.registry.OAuthProviderTypeRegistry</key>
+    <type>org.gatein.security.oauth.registry.OAuthProviderTypeRegistryImpl</type>
+  </component>
+
+  <component>
     <type>org.exoplatform.web.security.codec.CodecInitializer</type>
   </component>
 
@@ -49,6 +54,76 @@
       <name>AccessTokenInvalidationListener</name>
       <set-method>addListenerPlugin</set-method>
       <type>org.gatein.security.oauth.data.AccessTokenInvalidationListener</type>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.gatein.security.oauth.registry.OAuthProviderTypeRegistry</target-component>
+    <component-plugin>
+      <name>FacebookOauthProvider</name>
+      <set-method>addPlugin</set-method>
+      <type>org.gatein.security.oauth.registry.OauthProviderTypeRegistryPlugin</type>
+      <init-params>
+        <value-param>
+          <name>key</name>
+          <value>FACEBOOK</value>
+        </value-param>
+        <value-param>
+          <name>enabled</name>
+          <value>true</value>
+        </value-param>
+        <value-param>
+          <name>userNameAttributeName</name>
+          <value>user.social-info.facebook.userName</value>
+        </value-param>
+        <value-param>
+          <name>oauthProviderProcessorClass</name>
+          <value>user.social-info.facebook.accessToken</value>
+        </value-param>
+        <value-param>
+          <name>initOAuthURL</name>
+          <value>/facebookAuth</value>
+        </value-param>
+        <value-param>
+          <name>friendlyName</name>
+          <value>Facebook</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.gatein.security.oauth.registry.OAuthProviderTypeRegistry</target-component>
+    <component-plugin>
+      <name>GoogleOauthProvider</name>
+      <set-method>addPlugin</set-method>
+      <type>org.gatein.security.oauth.registry.OauthProviderTypeRegistryPlugin</type>
+      <init-params>
+        <value-param>
+          <name>key</name>
+          <value>GOOGLE</value>
+        </value-param>
+        <value-param>
+          <name>enabled</name>
+          <value>true</value>
+        </value-param>
+        <value-param>
+          <name>userNameAttributeName</name>
+          <value>user.social-info.google.userName</value>
+        </value-param>
+        <value-param>
+          <name>oauthProviderProcessorClass</name>
+          <value>user.social-info.google.accessToken</value>
+        </value-param>
+        <value-param>
+          <name>initOAuthURL</name>
+          <value>/googleAuth</value>
+        </value-param>
+        <value-param>
+          <name>friendlyName</name>
+          <value>Google+</value>
+        </value-param>
+      </init-params>
     </component-plugin>
   </external-component-plugins>
 
