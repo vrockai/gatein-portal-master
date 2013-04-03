@@ -97,8 +97,6 @@ public class OAuthConstants {
 
     public static final String PROFILE_GOOGLE_ACCESS_TOKEN = "user.social-info.google.accessToken";
 
-    public static final String PROFILE_GOOGLE_ID_TOKEN = "user.social-info.google.idToken";
-
     public static final String PROFILE_GOOGLE_REFRESH_TOKEN = "user.social-info.google.refreshToken";
 
     public static final String PROFILE_GOOGLE_SCOPE = "user.social-info.google.scope";

@@ -54,8 +54,6 @@ public class TwitterProcessorImpl implements TwitterProcessor {
 
     private static Logger log = LoggerFactory.getLogger(TwitterProcessorImpl.class);
 
-    private static final String ACCESS_TOKEN_DELIMITER = "@_@_@";
-
     private final String redirectURL;
     private final String clientID;
     private final String clientSecret;

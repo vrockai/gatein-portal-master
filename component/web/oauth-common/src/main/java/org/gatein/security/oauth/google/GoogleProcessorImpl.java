@@ -68,8 +68,6 @@ public class GoogleProcessorImpl implements GoogleProcessor {
 
     private static Logger log = LoggerFactory.getLogger(GoogleProcessorImpl.class);
 
-    private static final String ACCESS_TOKEN_DELIMITER = "@_@_@";
-
     private final String redirectURL;
     private final String clientID;
     private final String clientSecret;
@@ -97,7 +95,7 @@ public class GoogleProcessorImpl implements GoogleProcessor {
         this.scopes = null;
         this.accessType = null;
         this.applicationName = null;
-        secureRandomService = null;
+        this.secureRandomService = null;
     }
 
     public GoogleProcessorImpl(ExoContainerContext context, InitParams params, SecureRandomService secureRandomService) {
@@ -197,7 +195,7 @@ public class GoogleProcessorImpl implements GoogleProcessor {
                 clientSecret, code, redirectURL).execute();
 
         if (log.isTraceEnabled()) {
-            log.trace("Successfully obtained accessToken from google" + tokenResponse);
+            log.trace("Successfully obtained accessToken from google: " + tokenResponse);
         }
 
         return tokenResponse;
