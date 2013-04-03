@@ -40,11 +40,11 @@ import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.impl.UserImpl;
 import org.exoplatform.web.security.codec.AbstractCodec;
 import org.exoplatform.web.security.codec.CodecInitializer;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
+import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.data.SocialNetworkService;
-import org.gatein.common.exception.GateInException;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 import org.gatein.security.oauth.twitter.TwitterAccessTokenContext;
 
@@ -133,10 +133,10 @@ public class TestSocialNetworkService extends AbstractKernelTest {
             socialNetworkService.updateOAuthInfo(getFacebookProvider(), user2.getUserName(), "joseph.doyle.changed", "someToken");
 
             fail("Exception should occur because of duplicated facebook username");
-        } catch (GateInException gtnOauthException) {
-            assertEquals(GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME, gtnOauthException.getExceptionCode());
-            assertEquals(OAuthConstants.PROFILE_FACEBOOK_USERNAME, gtnOauthException.getExceptionAttribute(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME));
-            assertEquals("joseph.doyle.changed", gtnOauthException.getExceptionAttribute(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME));
+        } catch (OAuthException gtnOauthOAuthException) {
+            assertEquals(OAuthExceptionCode.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME, gtnOauthOAuthException.getExceptionCode());
+            assertEquals(OAuthConstants.PROFILE_FACEBOOK_USERNAME, gtnOauthOAuthException.getExceptionAttribute(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME));
+            assertEquals("joseph.doyle.changed", gtnOauthOAuthException.getExceptionAttribute(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME));
         } catch (Exception e) {
             throw new UndeclaredThrowableException(e);
         }

@@ -41,8 +41,7 @@ import org.exoplatform.web.application.RequestFailure;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.organization.UIUserProfileInputSet;
-import org.gatein.common.exception.GateInException;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthConstants;
@@ -95,18 +94,18 @@ public class OAuthLifecycle implements ApplicationLifecycle<PortalRequestContext
             httpSession.removeAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER_USERNAME_ATTR_NAME);
 
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, oauthProviderUsernameAttrName);
-            map.put(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, context.getRemoteUser());
+            map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, oauthProviderUsernameAttrName);
+            map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, context.getRemoteUser());
             Object[] args = UIUserProfileInputSet.convertOAuthExceptionAttributes(context, "UIAccountSocial.label.", map);
             context.getUIApplication().addMessage(new ApplicationMessage("UIAccountSocial.msg.successful-link", args));
         }
 
         // Show message about failed social account linking
-        GateInException gtnException = (GateInException)httpSession.getAttribute(OAuthConstants.ATTRIBUTE_EXCEPTION_AFTER_FAILED_LINK);
-        if (gtnException != null) {
+        OAuthException gtnOAuthException = (OAuthException)httpSession.getAttribute(OAuthConstants.ATTRIBUTE_EXCEPTION_AFTER_FAILED_LINK);
+        if (gtnOAuthException != null) {
             httpSession.removeAttribute(OAuthConstants.ATTRIBUTE_EXCEPTION_AFTER_FAILED_LINK);
 
-            UIUserProfileInputSet.addOAuthExceptionMessage(context, gtnException, context.getUIApplication());
+            UIUserProfileInputSet.addOAuthExceptionMessage(context, gtnOAuthException, context.getUIApplication());
         }
     }
 

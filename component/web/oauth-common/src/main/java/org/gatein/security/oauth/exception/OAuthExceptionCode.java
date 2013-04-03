@@ -21,24 +21,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.common.exception;
+package org.gatein.security.oauth.exception;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class GateInExceptionConstants {
-
-    // Exception codes
-
-    /**
-     * Unspecified GateIn error
-     */
-    public static final int EXCEPTION_CODE_UNSPECIFIED = 0;
+public enum OAuthExceptionCode {
 
     /**
      * Unspecified GateIn+OAuth error
      */
-    public static final int EXCEPTION_CODE_OAUTH_UNSPECIFIED = 10;
+    EXCEPTION_UNSPECIFIED,
 
     /**
      * This error could happen during saving of user into GateIn identity database.
@@ -47,44 +40,25 @@ public class GateInExceptionConstants {
      *
      * For example: We want to save user 'john' with facebookUsername 'john.doyle' but we already have user 'johny2' with same facebookUsername 'john.doyle'
      */
-    public static final int EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME = 20;
+    EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME,
 
     /**
      * Some error during Twitter processing
      */
-    public static final int EXCEPTION_CODE_TWITTER_ERROR = 30;
+    EXCEPTION_CODE_TWITTER_ERROR,
 
     /**
      * Error when bad access token is given as parameter
      */
-    public static final int EXCEPTION_CODE_BAD_ACCESS_TOKEN = 40;
+    EXCEPTION_CODE_BAD_ACCESS_TOKEN,
 
     /**
      * Error when state parameter from request parameter, which is sent from OAuth provider, is not equals to previously sent state
      */
-    public static final int EXCEPTION_CODE_INVALID_STATE = 50;
+    EXCEPTION_CODE_INVALID_STATE,
 
     /**
      * Some error during Google processing
      */
-    public static final int EXCEPTION_CODE_GOOGLE_ERROR = 60;
-
-    /**
-     * This error could happen during initialization of AbstractCodec for symmetric encryption
-     */
-    public static final int EXCEPTION_CODEC_INITIALIZATION = 200;
-
-
-    // Key of exception attributes
-
-    /**
-     * Name of attribute with OAuth provider username
-     */
-    public static final String EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME = "OAuthProviderUsernameAttributeName";
-
-    /**
-     * OAuth provider username
-     */
-    public static final String EXCEPTION_OAUTH_PROVIDER_USERNAME = "OAuthProviderUsername";
-
+    EXCEPTION_CODE_GOOGLE_ERROR
 }

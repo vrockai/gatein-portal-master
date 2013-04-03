@@ -37,8 +37,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.services.oauth2.model.Userinfo;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
-import org.gatein.common.exception.GateInException;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.gatein.security.oauth.exception.OAuthException;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.common.OAuthPrincipal;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
@@ -133,7 +133,7 @@ public class OAuthUtils {
         try {
             return URLEncoder.encode(param, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_UNSPECIFIED, uee);
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_UNSPECIFIED, uee);
         }
     }
 

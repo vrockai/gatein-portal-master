@@ -32,7 +32,8 @@ import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.web.security.codec.AbstractCodec;
 import org.exoplatform.web.security.codec.CodecInitializer;
-import org.gatein.common.exception.GateInException;
+import org.exoplatform.web.security.security.TokenServiceInitializationException;
+import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthCodec;
@@ -49,7 +50,7 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
     private OrganizationService orgService;
     private AbstractCodec codec;
 
-    public SocialNetworkServiceImpl(OrganizationService orgService, CodecInitializer codecInitializer) {
+    public SocialNetworkServiceImpl(OrganizationService orgService, CodecInitializer codecInitializer) throws TokenServiceInitializationException {
         this.orgService = orgService;
         this.codec = codecInitializer.initCodec();
     }
@@ -82,7 +83,7 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
             oauthProviderProcessor.saveAccessTokenAttributesToUserProfile(userProfile, this, accessToken);
 
             userProfileHandler.saveUserProfile(userProfile, true);
-        } catch (GateInException gtnEx) {
+        } catch (OAuthException gtnEx) {
             throw gtnEx;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -128,7 +129,7 @@ public class SocialNetworkServiceImpl implements SocialNetworkService, OAuthCode
             OAuthProviderProcessor<T> oauthProviderProcessor = oauthProviderType.getOauthProviderProcessor();
             oauthProviderProcessor.saveAccessTokenAttributesToUserProfile(userProfile, this, accessToken);
             userProfileHandler.saveUserProfile(userProfile, true);
-        } catch (GateInException gtnEx) {
+        } catch (OAuthException gtnEx) {
             throw gtnEx;
         } catch (Exception e) {
             throw new RuntimeException(e);

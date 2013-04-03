@@ -33,8 +33,8 @@ import javax.servlet.http.HttpSession;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.UserProfile;
-import org.gatein.common.exception.GateInException;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.gatein.security.oauth.exception.OAuthException;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthCodec;
@@ -107,7 +107,7 @@ public class GateInFacebookProcessorImpl implements GateInFacebookProcessor {
             FacebookPrincipal principal = (FacebookPrincipal)facebookProcessor.getPrincipal(httpRequest, httpResponse);
 
             if (principal == null) {
-                throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_OAUTH_UNSPECIFIED, null, "Principal was null. Maybe login modules need to be configured properly.");
+                throw new OAuthException(OAuthExceptionCode.EXCEPTION_UNSPECIFIED, null, "Principal was null. Maybe login modules need to be configured properly.");
             } else {
                 state = FacebookProcessor.STATES.FINISH.name();
                 httpRequest.getSession().setAttribute(FacebookProcessor.FB_AUTH_STATE_SESSION_ATTRIBUTE, state);

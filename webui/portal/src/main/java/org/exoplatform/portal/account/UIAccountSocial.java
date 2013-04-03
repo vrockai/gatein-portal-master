@@ -50,13 +50,11 @@ import org.exoplatform.webui.event.EventListener;
 import org.exoplatform.webui.form.UIForm;
 import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.organization.UIUserProfileInputSet;
-import org.gatein.common.exception.GateInExceptionConstants;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthConstants;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
-import thredds.inventory.CollectionManager;
 
 /**
  * Social networks tab of user profile
@@ -150,8 +148,8 @@ public class UIAccountSocial extends UIForm {
                 service.getUserProfileHandler().saveUserProfile(userProfile, true);
 
                 Map<String, Object> map = new HashMap<String, Object>();
-                map.put(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, oauthProviderTypeToUnlink.getUserNameAttrName());
-                map.put(GateInExceptionConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, userName);
+                map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, oauthProviderTypeToUnlink.getUserNameAttrName());
+                map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, userName);
                 Object[] args = UIUserProfileInputSet.convertOAuthExceptionAttributes(context, "UIAccountSocial.label.", map);
                 uiApp.addMessage(new ApplicationMessage("UIAccountSocial.msg.successful-unlink", args));
 

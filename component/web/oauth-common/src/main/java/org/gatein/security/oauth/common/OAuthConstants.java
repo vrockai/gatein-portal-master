@@ -141,4 +141,11 @@ public class OAuthConstants {
 
     public static final String PARAM_OAUTH_INTERACTION_VALUE_START = "start";
 
+
+    // Exception constants
+
+    public static final String EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME = "OAuthProviderUsernameAttributeName";
+
+    public static final String EXCEPTION_OAUTH_PROVIDER_USERNAME = "OAuthProviderUsername";
+
 }

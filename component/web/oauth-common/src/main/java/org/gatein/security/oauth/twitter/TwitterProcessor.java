@@ -28,11 +28,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.gatein.common.exception.GateInException;
+import org.gatein.security.oauth.exception.OAuthException;
 import org.gatein.security.oauth.common.OAuthProviderProcessor;
 import twitter4j.Twitter;
-import twitter4j.User;
-import twitter4j.auth.AccessToken;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -40,7 +38,7 @@ import twitter4j.auth.AccessToken;
 public interface TwitterProcessor extends OAuthProviderProcessor<TwitterAccessTokenContext> {
 
     TwitterInteractionState processTwitterAuthInteraction(HttpServletRequest request, HttpServletResponse response) throws
-            IOException, GateInException;
+            IOException, OAuthException;
 
     Twitter getAuthorizedTwitterInstance(TwitterAccessTokenContext accessTokenContext);
 }

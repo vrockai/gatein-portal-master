@@ -38,8 +38,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.exoplatform.commons.utils.PropertyManager;
-import org.gatein.common.exception.GateInException;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.exoplatform.web.security.security.TokenServiceInitializationException;
 import org.gatein.common.io.IOTools;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -53,7 +52,7 @@ public class CodecInitializer {
 
     private final Logger log = LoggerFactory.getLogger(CodecInitializer.class);
 
-    public AbstractCodec initCodec() {
+    public AbstractCodec initCodec() throws TokenServiceInitializationException {
         String builderType = PropertyManager.getProperty("gatein.codec.builderclass");
         Map<String, String> config = new HashMap<String, String>();
 
@@ -72,7 +71,7 @@ public class CodecInitializer {
                 }
                 config.put("gatein.codec.config.basedir", f.getParentFile().getAbsolutePath());
             } catch (IOException e) {
-                throw new GateInException(GateInExceptionConstants.EXCEPTION_CODEC_INITIALIZATION, "Failed to read the config parameters from file '" + configFile
+                throw new TokenServiceInitializationException("Failed to read the config parameters from file '" + configFile
                         + "'.", e);
             } finally {
                 IOTools.safeClose(in);
@@ -83,7 +82,7 @@ public class CodecInitializer {
             builderType = "org.exoplatform.web.security.codec.JCASymmetricCodecBuilder";
             String gtnConfDir = PropertyManager.getProperty("gatein.conf.dir");
             if (gtnConfDir == null || gtnConfDir.length() == 0) {
-                throw new GateInException(GateInExceptionConstants.EXCEPTION_CODEC_INITIALIZATION, "'gatein.conf.dir' property must be set.");
+                throw new TokenServiceInitializationException("'gatein.conf.dir' property must be set.");
             }
             File f = new File(gtnConfDir + "/codec/codeckey.txt");
             if (!f.exists()) {
@@ -103,7 +102,7 @@ public class CodecInitializer {
                     out = new FileOutputStream(f);
                     store.store(out, "gtnStorePass".toCharArray());
                 } catch (Exception e) {
-                    throw new GateInException(GateInExceptionConstants.EXCEPTION_CODEC_INITIALIZATION, e);
+                    throw new TokenServiceInitializationException(e);
                 } finally {
                     IOTools.safeClose(out);
                 }
@@ -121,7 +120,7 @@ public class CodecInitializer {
             log.info("Initialized codec using builder " + builderType);
             return Class.forName(builderType).asSubclass(AbstractCodecBuilder.class).newInstance().build(config);
         } catch (Exception e) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODEC_INITIALIZATION, "Could not initialize codec.", e);
+            throw new TokenServiceInitializationException("Could not initialize codec.", e);
         }
     }
 }

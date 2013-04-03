@@ -45,8 +45,8 @@ import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 import org.exoplatform.webui.organization.UIUserProfileInputSet;
-import org.gatein.common.exception.GateInException;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.gatein.security.oauth.exception.OAuthException;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthConstants;
@@ -156,20 +156,20 @@ public class UIRegisterOAuth extends UIContainer {
                 newUserProfile.setAttribute(oauthPrincipal.getOauthProviderType().getUserNameAttrName(), oauthPrincipal.getUserName());
                 try {
                     profileHandler.saveUserProfile(newUserProfile, true);
-                } catch (GateInException gtnOauthException) {
+                } catch (OAuthException gtnOauthOAuthException) {
                     // Show warning message if user with this facebookUsername (or googleUsername) already exists
                     // NOTE: It could happen only in case of parallel registration of same oauth user from more browser windows
-                    if (gtnOauthException.getExceptionCode() == GateInExceptionConstants.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
+                    if (gtnOauthOAuthException.getExceptionCode() == OAuthExceptionCode.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
 
                         // Drop new user
                         orgService.getUserHandler().removeUser(newUser.getUserName(), true);
 
                         // Clear previous message about successful creation of user because we dropped him. Add message about duplicate oauth username
                         uiApp.clearMessages();
-                        UIUserProfileInputSet.addOAuthExceptionMessage(context, gtnOauthException, uiApp);
+                        UIUserProfileInputSet.addOAuthExceptionMessage(context, gtnOauthOAuthException, uiApp);
                         return;
                     } else {
-                        throw gtnOauthException;
+                        throw gtnOauthOAuthException;
                     }
                 }
 

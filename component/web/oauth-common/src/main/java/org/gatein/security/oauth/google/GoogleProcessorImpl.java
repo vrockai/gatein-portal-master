@@ -24,8 +24,6 @@
 package org.gatein.security.oauth.google;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,9 +39,7 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
-import com.google.api.client.util.ObjectParser;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Tokeninfo;
 import com.google.api.services.oauth2.model.Userinfo;
@@ -53,13 +49,12 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.web.security.security.SecureRandomService;
-import org.gatein.common.exception.GateInException;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.gatein.security.oauth.exception.OAuthException;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthCodec;
 import org.gatein.security.oauth.common.OAuthConstants;
-import org.gatein.security.oauth.utils.OAuthUtils;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -185,7 +180,7 @@ public class GoogleProcessorImpl implements GoogleProcessor {
         String stateFromSession = (String)session.getAttribute(OAuthConstants.ATTRIBUTE_VERIFICATION_STATE);
         String stateFromRequest = request.getParameter("state");
         if (stateFromSession == null || stateFromRequest == null || !stateFromSession.equals(stateFromRequest)) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_INVALID_STATE, "Validation of state parameter failed. stateFromSession="
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_INVALID_STATE, "Validation of state parameter failed. stateFromSession="
                     + stateFromSession + ", stateFromRequest=" + stateFromRequest);
         }
 
@@ -208,11 +203,11 @@ public class GoogleProcessorImpl implements GoogleProcessor {
 
         // If there was an error in the token info, abort.
         if (tokenInfo.containsKey("error")) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_GOOGLE_ERROR, "Error during token validation: " + tokenInfo.get("error").toString());
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, "Error during token validation: " + tokenInfo.get("error").toString());
         }
 
         if (!tokenInfo.getIssuedTo().equals(clientID)) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_GOOGLE_ERROR, "Token's client ID does not match app's. clientID from tokenINFO: " + tokenInfo.getIssuedTo());
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, "Token's client ID does not match app's. clientID from tokenINFO: " + tokenInfo.getIssuedTo());
         }
 
         if (log.isTraceEnabled()) {
@@ -305,7 +300,7 @@ public class GoogleProcessorImpl implements GoogleProcessor {
                 log.trace("Revoked token " + tokenData);
             }
         } catch (IOException ioe) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_GOOGLE_ERROR, "Error when revoking token", ioe);
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, "Error when revoking token", ioe);
         }
     }
 }

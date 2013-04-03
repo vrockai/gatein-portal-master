@@ -33,8 +33,8 @@ import javax.servlet.http.HttpSession;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.UserProfile;
-import org.gatein.common.exception.GateInException;
-import org.gatein.common.exception.GateInExceptionConstants;
+import org.gatein.security.oauth.exception.OAuthException;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthCodec;
@@ -92,7 +92,7 @@ public class TwitterProcessorImpl implements TwitterProcessor {
 
     @Override
     public TwitterInteractionState processTwitterAuthInteraction(HttpServletRequest request, HttpServletResponse response) throws
-            IOException, GateInException {
+            IOException, OAuthException {
         Twitter twitter = twitterFactory.getInstance();
 
         HttpSession session = request.getSession();
@@ -133,7 +133,7 @@ public class TwitterProcessorImpl implements TwitterProcessor {
                 return new TwitterInteractionState(TwitterInteractionState.STATE.FINISH, null, accessToken, twitterUser);
             }
         } catch (TwitterException twitterException) {
-            throw new GateInException(GateInExceptionConstants.EXCEPTION_CODE_TWITTER_ERROR, twitterException);
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_TWITTER_ERROR, twitterException);
         }
     }
 
