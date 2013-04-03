@@ -116,7 +116,7 @@ public class OAuthConstants {
 
     public static final String ATTRIBUTE_SOCIAL_NETWORK_PROVIDER_TO_UNLINK = "_socialNetworkProviderToUnlink";
 
-    public static final String ATTRIBUTE_LINKED_OAUTH_PROVIDER_USERNAME_ATTR_NAME = "_linkedOAuthProviderUsernameAttrName";
+    public static final String ATTRIBUTE_LINKED_OAUTH_PROVIDER = "_linkedOAuthProviderUsernameAttrName";
 
     public static final String ATTRIBUTE_EXCEPTION_AFTER_FAILED_LINK = "_oauthExceptionAfterFailedLink";
 
@@ -147,5 +147,7 @@ public class OAuthConstants {
     public static final String EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME = "OAuthProviderUsernameAttributeName";
 
     public static final String EXCEPTION_OAUTH_PROVIDER_USERNAME = "OAuthProviderUsername";
+
+    public static final String EXCEPTION_OAUTH_PROVIDER_NAME = "OAuthProviderName";
 
 }

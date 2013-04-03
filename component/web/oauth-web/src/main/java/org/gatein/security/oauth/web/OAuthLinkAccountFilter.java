@@ -84,7 +84,7 @@ public class OAuthLinkAccountFilter extends AbstractSSOInterceptor {
                     oauthPrincipal.getUserName(), oauthPrincipal.getAccessToken());
 
             // Add some attribute to session, which will be read by OAuthLifecycle
-            session.setAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER_USERNAME_ATTR_NAME, oauthPrincipal.getOauthProviderType().getUserNameAttrName());
+            session.setAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER, oauthPrincipal.getOauthProviderType().getFriendlyName());
         } catch (OAuthException gtnOauthOAuthException) {
             // Show warning message if user with this facebookUsername (or googleUsername) already exists
             if (gtnOauthOAuthException.getExceptionCode() == OAuthExceptionCode.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {

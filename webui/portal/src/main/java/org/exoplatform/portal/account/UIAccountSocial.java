@@ -147,10 +147,7 @@ public class UIAccountSocial extends UIForm {
 
                 service.getUserProfileHandler().saveUserProfile(userProfile, true);
 
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, oauthProviderTypeToUnlink.getUserNameAttrName());
-                map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, userName);
-                Object[] args = UIUserProfileInputSet.convertOAuthExceptionAttributes(context, "UIAccountSocial.label.", map);
+                Object[] args = { oauthProviderTypeToUnlink.getFriendlyName(), userName};
                 uiApp.addMessage(new ApplicationMessage("UIAccountSocial.msg.successful-unlink", args));
 
                 prContext.setAttribute(UserProfileLifecycle.USER_PROFILE_ATTRIBUTE_NAME, userProfile);

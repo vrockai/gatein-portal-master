@@ -64,6 +64,7 @@ public class UniqueOAuthProviderUsernameListener extends UserProfileEventListene
                 Map<String, Object> exceptionAttribs = new HashMap<String, Object>();
                 exceptionAttribs.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, opt.getUserNameAttrName());
                 exceptionAttribs.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, oauthProviderUsername);
+                exceptionAttribs.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_NAME, opt.getFriendlyName());
 
                 throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME, exceptionAttribs, message);
             }

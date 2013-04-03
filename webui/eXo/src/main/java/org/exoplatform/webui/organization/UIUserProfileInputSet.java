@@ -293,14 +293,14 @@ public class UIUserProfileInputSet extends UIFormInputSet {
         }
     }
 
-    public static final void addOAuthExceptionMessage(WebuiRequestContext context, OAuthException gtnOauthOAuthException, UIApplication uiApp) {
+    private void addOAuthExceptionMessage(WebuiRequestContext context, OAuthException gtnOauthOAuthException, UIApplication uiApp) {
         Object[] args = convertOAuthExceptionAttributes(context, "UIAccountSocial.label.", gtnOauthOAuthException.getExceptionAttributes());
         ApplicationMessage appMessage = new ApplicationMessage("UIUserProfileInputSet.msg.oauth-username-exists", args, ApplicationMessage.WARNING);
         appMessage.setArgsLocalized(false);
         uiApp.addMessage(appMessage);
     }
 
-    public static Object[] convertOAuthExceptionAttributes(WebuiRequestContext context, String messageKeyPrefix, Map<String, Object> exceptionAttribs) {
+    private Object[] convertOAuthExceptionAttributes(WebuiRequestContext context, String messageKeyPrefix, Map<String, Object> exceptionAttribs) {
         String oauthProviderUsernameAttrName = (String)exceptionAttribs.get(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME);
         ResourceBundle resBundle = context.getApplicationResourceBundle();
         String localizedOAuthProviderUsernameAttrName;

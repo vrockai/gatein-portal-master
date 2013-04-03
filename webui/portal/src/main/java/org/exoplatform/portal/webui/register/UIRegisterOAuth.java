@@ -34,6 +34,7 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.services.organization.idm.UserImpl;
+import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.web.security.AuthenticationRegistry;
 import org.exoplatform.web.url.navigation.NavigationResource;
 import org.exoplatform.web.url.navigation.NodeURL;
@@ -156,20 +157,22 @@ public class UIRegisterOAuth extends UIContainer {
                 newUserProfile.setAttribute(oauthPrincipal.getOauthProviderType().getUserNameAttrName(), oauthPrincipal.getUserName());
                 try {
                     profileHandler.saveUserProfile(newUserProfile, true);
-                } catch (OAuthException gtnOauthOAuthException) {
+                } catch (OAuthException gtnOAuthException) {
                     // Show warning message if user with this facebookUsername (or googleUsername) already exists
                     // NOTE: It could happen only in case of parallel registration of same oauth user from more browser windows
-                    if (gtnOauthOAuthException.getExceptionCode() == OAuthExceptionCode.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
+                    if (gtnOAuthException.getExceptionCode() == OAuthExceptionCode.EXCEPTION_CODE_DUPLICATE_OAUTH_PROVIDER_USERNAME) {
 
                         // Drop new user
                         orgService.getUserHandler().removeUser(newUser.getUserName(), true);
 
                         // Clear previous message about successful creation of user because we dropped him. Add message about duplicate oauth username
-                        uiApp.clearMessages();
-                        UIUserProfileInputSet.addOAuthExceptionMessage(context, gtnOauthOAuthException, uiApp);
+                        Object[] args = new Object[] {gtnOAuthException.getExceptionAttribute(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME),
+                                gtnOAuthException.getExceptionAttribute(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_NAME)};
+                        ApplicationMessage appMessage = new ApplicationMessage("UIAccountSocial.msg.failed-registration", args, ApplicationMessage.WARNING);
+                        uiApp.addMessage(appMessage);
                         return;
                     } else {
-                        throw gtnOauthOAuthException;
+                        throw gtnOAuthException;
                     }
                 }
 

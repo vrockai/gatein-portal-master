@@ -67,12 +67,12 @@ public class OAuthLifecycle implements ApplicationLifecycle<PortalRequestContext
     public void onStartRequest(Application app, PortalRequestContext context) throws Exception {
         HttpServletRequest httpRequest = context.getRequest();
         HttpSession httpSession = httpRequest.getSession();
+        UIPortalApplication uiApp = Util.getUIPortalApplication();
 
         User oauthAuthenticatedUser = (User)authRegistry.getAttributeOfClient(httpRequest, OAuthConstants.ATTRIBUTE_AUTHENTICATED_PORTAL_USER);
 
         // Display Registration form after successful OAuth authentication.
         if (oauthAuthenticatedUser != null) {
-            UIPortalApplication uiApp = Util.getUIPortalApplication();
             UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
 
             if (log.isTraceEnabled()) {
@@ -89,15 +89,11 @@ public class OAuthLifecycle implements ApplicationLifecycle<PortalRequestContext
         }
 
         // Show message about successful social account linking
-        String oauthProviderUsernameAttrName = (String)httpSession.getAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER_USERNAME_ATTR_NAME);
-        if (oauthProviderUsernameAttrName != null) {
-            httpSession.removeAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER_USERNAME_ATTR_NAME);
+        String socialNetworkName = (String)httpSession.getAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER);
+        if (socialNetworkName != null) {
+            httpSession.removeAttribute(OAuthConstants.ATTRIBUTE_LINKED_OAUTH_PROVIDER);
 
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME_ATTRIBUTE_NAME, oauthProviderUsernameAttrName);
-            map.put(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME, context.getRemoteUser());
-            Object[] args = UIUserProfileInputSet.convertOAuthExceptionAttributes(context, "UIAccountSocial.label.", map);
-            context.getUIApplication().addMessage(new ApplicationMessage("UIAccountSocial.msg.successful-link", args));
+            uiApp.addMessage(new ApplicationMessage("UIAccountSocial.msg.successful-link", new Object[] {socialNetworkName, context.getRemoteUser()}));
         }
 
         // Show message about failed social account linking
@@ -105,7 +101,10 @@ public class OAuthLifecycle implements ApplicationLifecycle<PortalRequestContext
         if (gtnOAuthException != null) {
             httpSession.removeAttribute(OAuthConstants.ATTRIBUTE_EXCEPTION_AFTER_FAILED_LINK);
 
-            UIUserProfileInputSet.addOAuthExceptionMessage(context, gtnOAuthException, context.getUIApplication());
+            Object[] args = new Object[] {gtnOAuthException.getExceptionAttribute(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_USERNAME),
+                    gtnOAuthException.getExceptionAttribute(OAuthConstants.EXCEPTION_OAUTH_PROVIDER_NAME)};
+            ApplicationMessage appMessage = new ApplicationMessage("UIAccountSocial.msg.failed-link", args, ApplicationMessage.WARNING);
+            uiApp.addMessage(appMessage);
         }
     }
 
