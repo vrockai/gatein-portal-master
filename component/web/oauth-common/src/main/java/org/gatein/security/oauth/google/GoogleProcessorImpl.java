@@ -259,8 +259,12 @@ public class GoogleProcessorImpl implements GoogleProcessor {
         String encodedRefreshToken = codec.encodeString(accessToken.getRefreshToken());
         String encodedScope = codec.encodeString(accessToken.getScope());
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_ACCESS_TOKEN, encodedAccessToken);
-        userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN, encodedRefreshToken);
         userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_SCOPE, encodedScope);
+
+        // Don't overwrite existing refresh token because it's not present in every accessToken response (only in very first one)
+        if (encodedRefreshToken != null) {
+            userProfile.setAttribute(OAuthConstants.PROFILE_GOOGLE_REFRESH_TOKEN, encodedRefreshToken);
+        }
     }
 
     @Override
