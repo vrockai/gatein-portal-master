@@ -34,6 +34,7 @@ import javax.servlet.http.HttpSession;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
@@ -304,7 +305,22 @@ public class GoogleProcessorImpl implements GoogleProcessor {
                 log.trace("Revoked token " + tokenData);
             }
         } catch (IOException ioe) {
-            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, "Error when revoking token", ioe);
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_TOKEN_REVOKE_FAILED, "Error when revoking token", ioe);
+        }
+    }
+
+    @Override
+    public GoogleTokenResponse refreshToken(GoogleTokenResponse tokenData) {
+        if (tokenData.getRefreshToken() == null || tokenData.getRefreshToken().length() == 0) {
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, "Given GoogleTokenResponse does not contain refreshToken");
+        }
+
+        try {
+            GoogleRefreshTokenRequest refreshTokenRequest = new GoogleRefreshTokenRequest(TRANSPORT, JSON_FACTORY, tokenData.getRefreshToken(),
+                    this.clientID, this.clientSecret);
+            return refreshTokenRequest.execute();
+        } catch (IOException ioe) {
+            throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, ioe);
         }
     }
 }

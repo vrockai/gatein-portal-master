@@ -47,5 +47,6 @@ public interface GoogleProcessor extends OAuthProviderProcessor<GoogleTokenRespo
 
     Plus getPlusService(GoogleTokenResponse tokenData);
 
-    void revokeToken(GoogleTokenResponse tokenData);
+    GoogleTokenResponse refreshToken(GoogleTokenResponse tokenData);
+
 }
