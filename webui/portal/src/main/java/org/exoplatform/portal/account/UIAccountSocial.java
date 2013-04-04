@@ -159,7 +159,8 @@ public class UIAccountSocial extends UIForm {
                     } catch (OAuthException oe) {
                         if (OAuthExceptionCode.EXCEPTION_CODE_TOKEN_REVOKE_FAILED.equals(oe.getExceptionCode())) {
                             uiApp.addMessage(new ApplicationMessage("UIAccountSocial.msg.failed-revoke", new Object[] { oe.getMessage() }, ApplicationMessage.WARNING));
-                            log.warn("Revocation of accessToken failed", oe);
+                            Throwable t = oe.getCause() != null ? oe.getCause() : oe;
+                            log.warn("Revocation of accessToken failed", t);
                         } else {
                             throw oe;
                         }
