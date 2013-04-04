@@ -60,5 +60,10 @@ public enum OAuthExceptionCode {
     /**
      * Some error during Google processing
      */
-    EXCEPTION_CODE_GOOGLE_ERROR
+    EXCEPTION_CODE_GOOGLE_ERROR,
+
+    /**
+     * Error when revoking of accessToken of any provider failed
+     */
+    EXCEPTION_CODE_TOKEN_REVOKE_FAILED
 }

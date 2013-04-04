@@ -52,6 +52,9 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.security.oauth.common.OAuthProviderType;
 import org.gatein.security.oauth.common.OAuthConstants;
+import org.gatein.security.oauth.data.SocialNetworkService;
+import org.gatein.security.oauth.exception.OAuthException;
+import org.gatein.security.oauth.exception.OAuthExceptionCode;
 import org.gatein.security.oauth.registry.OAuthProviderTypeRegistry;
 
 /**
@@ -138,13 +141,30 @@ public class UIAccountSocial extends UIForm {
                 String unlinkProviderKey = prContext.getRequestParameter(PARAM_PROVIDER_FOR_UNLINK);
                 OAuthProviderType oauthProviderTypeToUnlink = uiForm.getApplicationComponent(OAuthProviderTypeRegistry.class).getOAuthProvider(unlinkProviderKey);
 
+                // Obtain current accessToken
+                Object accessToken = uiForm.getApplicationComponent(SocialNetworkService.class).getOAuthAccessToken(oauthProviderTypeToUnlink, userName);
+
+                // Unlink social account in userProfile (AccessTokenInvalidationListener will automatically remove accessToken)
                 if (oauthProviderTypeToUnlink != null) {
                     userProfile.setAttribute(oauthProviderTypeToUnlink.getUserNameAttrName(), null);
                 } else {
                     log.warn("Social account field to unlink not found");
                 }
-
                 service.getUserProfileHandler().saveUserProfile(userProfile, true);
+
+                // Revoke accessToken remotely
+                if (accessToken != null) {
+                    try {
+                        oauthProviderTypeToUnlink.getOauthProviderProcessor().revokeToken(accessToken);
+                    } catch (OAuthException oe) {
+                        if (OAuthExceptionCode.EXCEPTION_CODE_TOKEN_REVOKE_FAILED.equals(oe.getExceptionCode())) {
+                            uiApp.addMessage(new ApplicationMessage("UIAccountSocial.msg.failed-revoke", new Object[] { oe.getMessage() }, ApplicationMessage.WARNING));
+                            log.warn("Revocation of accessToken failed", oe);
+                        } else {
+                            throw oe;
+                        }
+                    }
+                }
 
                 Object[] args = { oauthProviderTypeToUnlink.getFriendlyName(), userName};
                 uiApp.addMessage(new ApplicationMessage("UIAccountSocial.msg.successful-unlink", args));
