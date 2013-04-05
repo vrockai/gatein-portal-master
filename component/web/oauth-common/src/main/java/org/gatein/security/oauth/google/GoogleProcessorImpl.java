@@ -38,6 +38,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
@@ -299,26 +300,56 @@ public class GoogleProcessorImpl implements GoogleProcessor {
     @Override
     public void revokeToken(GoogleTokenResponse tokenData) {
         try {
-            HttpResponse revokeResponse = TRANSPORT.createRequestFactory()
-                    .buildGetRequest(new GenericUrl("https://accounts.google.com/o/oauth2/revoke?token=" + tokenData.getAccessToken())).execute();
-            if (log.isTraceEnabled()) {
-                log.trace("Revoked token " + tokenData);
-            }
+            revokeTokenImpl(tokenData);
         } catch (IOException ioe) {
+            if (ioe instanceof HttpResponseException) {
+                HttpResponseException googleException = (HttpResponseException)ioe;
+                if (googleException.getStatusCode() == 400 && googleException.getContent().contains("invalid_token") && tokenData.getRefreshToken() != null) {
+                    try {
+                        // Refresh token and retry revocation with refreshed token
+                        refreshToken(tokenData);
+                        revokeTokenImpl(tokenData);
+                        return;
+                    } catch (OAuthException refreshException) {
+                        // Log this one with trace level. We will rethrow original exception
+                        if (log.isTraceEnabled()) {
+                            log.trace("Refreshing token failed", refreshException);
+                        }
+                    } catch (IOException ioe2) {
+                        ioe = ioe2;
+                    }
+                }
+            }
             throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_TOKEN_REVOKE_FAILED, "Error when revoking token", ioe);
         }
     }
 
+    // Send request to google without any exception handling.
+    private void revokeTokenImpl(GoogleTokenResponse tokenData) throws IOException {
+        TRANSPORT.createRequestFactory()
+                .buildGetRequest(new GenericUrl("https://accounts.google.com/o/oauth2/revoke?token=" + tokenData.getAccessToken())).execute();
+        if (log.isTraceEnabled()) {
+            log.trace("Revoked token " + tokenData);
+        }
+    }
+
     @Override
-    public GoogleTokenResponse refreshToken(GoogleTokenResponse tokenData) {
-        if (tokenData.getRefreshToken() == null || tokenData.getRefreshToken().length() == 0) {
+    public void refreshToken(GoogleTokenResponse tokenData) {
+        if (tokenData.getRefreshToken() == null) {
             throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, "Given GoogleTokenResponse does not contain refreshToken");
         }
 
         try {
             GoogleRefreshTokenRequest refreshTokenRequest = new GoogleRefreshTokenRequest(TRANSPORT, JSON_FACTORY, tokenData.getRefreshToken(),
                     this.clientID, this.clientSecret);
-            return refreshTokenRequest.execute();
+            GoogleTokenResponse refreshed = refreshTokenRequest.execute();
+
+            // Update only 'accessToken' with new value
+            tokenData.setAccessToken(refreshed.getAccessToken());
+
+            if (log.isTraceEnabled()) {
+                log.trace("AccessToken refreshed successfully with value " + refreshed.getAccessToken());
+            }
         } catch (IOException ioe) {
             throw new OAuthException(OAuthExceptionCode.EXCEPTION_CODE_GOOGLE_ERROR, ioe);
         }
