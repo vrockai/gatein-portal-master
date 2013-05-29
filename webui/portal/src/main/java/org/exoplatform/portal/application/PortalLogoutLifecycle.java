@@ -23,18 +23,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.web.application.Application;
 import org.exoplatform.web.application.ApplicationLifecycle;
 import org.exoplatform.web.application.RequestFailure;
 import org.exoplatform.web.login.LogoutControl;
 import org.exoplatform.webui.application.WebuiRequestContext;
+import org.gatein.common.logging.Logger;
+import org.gatein.common.logging.LoggerFactory;
 import org.gatein.wci.ServletContainerFactory;
+import org.gatein.web.security.impersonation.CancelImpersonationFilter;
+import org.gatein.web.security.impersonation.ImpersonatedIdentity;
 
 /**
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
  * @version $Revision$
  */
 public class PortalLogoutLifecycle implements ApplicationLifecycle<WebuiRequestContext> {
+
+    private static final Logger log = LoggerFactory.getLogger(PortalLogoutLifecycle.class);
 
     public void onInit(Application app) throws Exception {
     }
@@ -52,7 +60,17 @@ public class PortalLogoutLifecycle implements ApplicationLifecycle<WebuiRequestC
             HttpServletRequest request = prContext.getRequest();
             HttpServletResponse response = prContext.getResponse();
 
-            if (request.getRemoteUser() != null) {
+            // Check if we are in the middle of impersonation and want to cancel it
+            Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+            if (currentIdentity instanceof ImpersonatedIdentity) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Triggered cancel of impersonation session. Saved flag " + CancelImpersonationFilter.ATTR_CANCEL_IMPERSONATION);
+                }
+                request.getSession().setAttribute(CancelImpersonationFilter.ATTR_CANCEL_IMPERSONATION, true);
+            } else if (request.getRemoteUser() != null) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Triggering WCI logout of user " + request.getRemoteUser());
+                }
                 ServletContainerFactory.getServletContainer().logout(request, response);
             }
         }
