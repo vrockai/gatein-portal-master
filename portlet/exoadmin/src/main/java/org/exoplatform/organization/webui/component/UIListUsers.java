@@ -250,7 +250,7 @@ public class UIListUsers extends UISearch {
                     .toString();
 
             // Redirect to impersonation servlet
-            portalRequestContext.sendRedirect(redirectURL);
+            portalRequestContext.getJavascriptManager().addJavascript("window.location = '" + redirectURL + "';");
         }
     }
 
