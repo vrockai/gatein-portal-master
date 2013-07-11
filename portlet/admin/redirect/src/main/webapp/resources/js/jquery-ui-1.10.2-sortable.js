@@ -2,9 +2,8 @@
 * http://jqueryui.com
 * Includes: jquery.ui.core.js, jquery.ui.widget.js, jquery.ui.mouse.js, jquery.ui.sortable.js
 * Copyright 2013 jQuery Foundation and other contributors Licensed MIT */
-
+(function($){
 (function( $, undefined ) {
-
 var uuid = 0,
 	runiqueId = /^ui-id-\d+$/;
 
@@ -2246,4 +2245,5 @@ $.widget("ui.sortable", $.ui.mouse, {
 
 });
 
+})(jQuery);
 })(jQuery);

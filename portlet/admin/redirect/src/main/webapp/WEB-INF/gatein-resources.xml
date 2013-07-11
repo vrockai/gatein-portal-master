@@ -4,11 +4,75 @@
     xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
     xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
 
-  <portlet-skin>
-    <application-name>redirect-admin-portlet</application-name>
-    <portlet-name>RedirectsAndImportExportAdminPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/css/DefaultStylesheet.css</css-path>
-  </portlet-skin>
+  <scripts>
+  <name>jquery_script</name>
+  <script>
+    <path>/resources/js/jquery-1.8.3.js</path>
+  </script>
+  </scripts>
+
+  <scripts>
+    <name>sortable_jquery</name>
+    <script>
+      <path>/resources/js/jquery-ui-1.10.2-sortable.js</path>
+    </script>
+
+    <depends>
+      <scripts>jquery_script</scripts>
+      <as>jQuery</as>
+    </depends>
+
+  </scripts>
+
+  <scripts>
+    <name>bootstrap_jquery</name>
+    <script>
+      <path>/resources/js/bootstrap.js</path>
+    </script>
+
+<depends>
+<scripts>jquery_script</scripts>
+<as>jQuery</as>
+</depends>
+
+</scripts>
+
+<scripts>
+<name>org_gatein_redirect_admin</name>
+
+<script>
+<path>/resources/js/admin.js</path>
+</script>
+
+<depends>
+<scripts>sortable_jquery</scripts>
+</depends>
+
+<depends>
+<scripts>bootstrap_jquery</scripts>
+</depends>
+
+<depends>
+<scripts>jquery_script</scripts>
+<as>jQuery</as>
+</depends>
+</scripts>
+
+<portlet-skin>
+<application-name>redirect-admin-portlet</application-name>
+<portlet-name>RedirectsAndImportExportAdminPortlet</portlet-name>
+<skin-name>Default</skin-name>
+<css-path>/css/DefaultStylesheet.css</css-path>
+</portlet-skin>
+
+<portlet>
+<name>RedirectsAndImportExportAdminPortlet</name>
+
+<scripts>
+<depends>
+<scripts>org_gatein_redirect_admin</scripts>
+</depends>
+</scripts>
+</portlet>
 
 </gatein-resources>
