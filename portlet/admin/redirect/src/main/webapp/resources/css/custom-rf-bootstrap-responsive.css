@@ -4026,11 +4026,11 @@
 }
 @font-face{
     font-family:'FontAwesome';
-    src:url(#{resource['/font-awesome/font/fontawesome-webfont.eot']});
-    src:url(#{resource['/font-awesome/font/fontawesome-webfont.eot']}?#iefix) format('embedded-opentype'), 
-        url(#{resource['/font-awesome/font/fontawesome-webfont.woff']}) format('woff'),
-        url(#{resource['/font-awesome/font//fontawesome-webfont.ttf']}) format('truetype'),
-        url(#{resource['/font-awesome/font//fontawesome-webfont.svg']}#FontAwesome) format('svg');
+    src:url("../font-awesome/font/fontawesome-webfont.eot");
+    src:url("../font-awesome/font/fontawesome-webfont.eot?#iefix") format('embedded-opentype'),
+        url("../font-awesome/font/fontawesome-webfont.woff") format('woff'),
+        url("../font-awesome/font//fontawesome-webfont.ttf") format('truetype'),
+        url("../font-awesome/font//fontawesome-webfont.svg#FontAwesome") format('svg');
         font-weight:normal;
         font-style:normal;
 }
