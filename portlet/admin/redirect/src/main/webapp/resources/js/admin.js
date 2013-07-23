@@ -1,41 +1,10 @@
-$(document).ready(function(){
-	init();
-});
-
-function init() {
-	// Bootstrap js
-	bootstrapDropdown();
-	bootstrapTooltip();
-	bootstrapAlert();
-	bootstrapPopover();
-	bootstrapButton();
-	bootstrapModal();
-	bootstrapTypeahead();
-	// Useful js
-	button();
-	toggleContent();
-	showHideMore();
-	radioBackground();
-	clearInputTextValue();
-	switchGroupView();
-	selectGroupInHierarchicalView();
-	// Provisional js	
-	selectPermission();
-	accessPermissionButton();
-	accessPermissionTable();
-	feedback();
-	editRedirect();
-	onConditionModal();
-	// Useful js that makes other ones not work
-	//sortable();
-}
-
+(function($){
 /* =========================
  * == ADD CONDITION MODAL ==
  * =========================
  */
 
-function addUAString(element) {
+addUAString = function(element) {
 	$(element).closest('td').append($('div.tt-ua').html());
 	$(element).closest('td').children('div:last').children('input').focus();
 	// set opacity to 0 so it keeps its space, and remove tooltip
@@ -44,9 +13,9 @@ function addUAString(element) {
 	// $(element).removeAttr("data-original-title");
 	// $(element).removeAttr('onclick');
 	$(element).hide();
-}
+};
 
-function removeUAString(element) {
+removeUAString=function(element) {
 	$(element).tooltip('hide');
 	// $(element).closest('div.more-condition').prev().find('button.add-user-agent-string').css('opacity','1');
 	// $(element).addClass('tooltipTrigger');
@@ -54,23 +23,23 @@ function removeUAString(element) {
 	parent = $(element).closest('div.more-condition').parent();
 	$(element).closest('div.more-condition').remove();
 	parent.children('div:last').find('button.add-user-agent-string').show();
-}
+};
 
-function afterAddProperty() {
+afterAddProperty=function() {
 	$('.property-operator').change();
 	$('.property-name-input').last().focus();
 	// disable all which are hidden
 	$('span[class^="pp-"]').filter(function() { return $(this).css("display") == "none"; }).children("div").children("input").prop('disabled', true);
-}
+};
 
-function removeProperty(element) {
+removeProperty=function(element) {
 	$(element).tooltip('hide');
 	parent = $(element).closest('tr.more-property').parent();
 	$(element).closest('tr.more-property').remove();
 	parent.children('tr:last').find('button.add-property').show();
-}
+};
 
-function changePropertyFields(element, focus) {
+changePropertyFields = function(element, focus) {
 	// Change input box(es) according to selected option
 	$(element).next().children().each(function() {
 		otherInput = $(this).children().children();
@@ -85,22 +54,22 @@ function changePropertyFields(element, focus) {
 	if (focus) {
 		curInput.first().focus();
 	}
-}
+};
 
-function addMappingEntry() {
+addMappingEntry = function() {
 	// Add a new entry
 	$('#mappings-tbody').prepend($('#tt-nm').children().html());
 	// And move focus to it
 	$('#mappings-tbody').find("input").first().focus();
-}
+};
 
-function editMappingEntry(elem) {
+editMappingEntry = function(elem) {
 	$(elem).parent().parent().addClass('hidden-element');
 	$(elem).parent().parent().nextAll('tr .hidden-element').first().removeClass('hidden-element');
 	return false;
-}
+};
 
-function deleteMappingEntry(elem) {
+deleteMappingEntry = function(elem) {
 	$(elem).tooltip("hide");
 	parentTR = $(elem).parent("td").parent("tr");
 	if ($(parentTR).hasClass("node-mapping-viewer")) {
@@ -123,9 +92,9 @@ function deleteMappingEntry(elem) {
 		}
 	}
 	return false;
-}
+};
 
-function validateCondition() {
+validateCondition = function() {
 	conditionName = $("input[id$='condition_name']").val();
 	if(!conditionName) {
 		$("input[id$='condition_name']").attr("disabled", "disabled");
@@ -134,17 +103,17 @@ function validateCondition() {
 		$("input[id$='condition_name']").removeAttr("disabled");
 	}
 
-}
+};
 
-function deleteRedirect(siteName, redirectName) {
+deleteRedirect = function(siteName, redirectName) {
 	$('#delete-redirect-site-input').attr("value", siteName);
 	$('#delete-redirect-site-text').text(siteName);
 	$('#delete-redirect-name-input').attr("value", redirectName);
 	$('#delete-redirect-name-text').text(redirectName);
 	$('#modal-delete-redirect').modal();
-}
+};
 
-function showAlert(title, message, aclass) {
+showAlert = function(title, message, aclass) {
 	$('#main-alert-title').text(title);
 	$('#main-alert-message').text(message);
 	$('#main-alert').addClass(aclass);
@@ -153,9 +122,9 @@ function showAlert(title, message, aclass) {
 	}, 1000, function() {
 		setTimeout(function(){hideAlert(aclass);}, 2000);
 	});
-}
+};
 
-function hideAlert(aclass) {
+hideAlert = function(aclass) {
 	$('#main-alert').animate({
 		opacity: 0
 	}, 1000, function() {
@@ -163,9 +132,9 @@ function hideAlert(aclass) {
 		$('#main-alert-title').text("<undefined>");
 		$('#main-alert-message').text("<undefined>");
 	});
-}
+};
 
-function configureRedirect() {
+configureRedirect = function() {
 	// FIXME: this is because the validation is not performed and last message still shows, we remove it manually
 	$('.rdr-name-error').hide();
 	$('.rdr-name-group').removeClass('error');
@@ -180,7 +149,7 @@ function configureRedirect() {
 			sortable();
 		});
 	});
-}
+};
 
 /**
  * Enable usage of keys to toggle ON/OFF switches.
@@ -194,13 +163,13 @@ $('.onoffswitch').live('keydown', function (e) {
 	}
 });
 
-function onConditionModal() {
+onConditionModal = function() {
 	$(document).on('shown', '#modal-condition', function () {
 		$('.property-operator').each(function() {
 			changePropertyFields(this, false);
 		});
 	});
-}
+};
 
 
 
@@ -301,6 +270,7 @@ showHideMore = function() {
 	});
 };
 
+    console.log("s1");
 //Sortable
 sortable = function() {
 	$(".sortable-rdr").sortable({
@@ -319,7 +289,7 @@ sortable = function() {
 		}
 	}).disableSelection();
 };
-
+    console.log("s2");
 
 // Fixes footer at the bottom
 footer = function() {
@@ -465,9 +435,9 @@ editRedirect = function() {
 
 /*
  * When on Redirect Configure view and the save changes or cancel button is pressed.
- * @ param save if there was a save invoked
+ * param save if there was a save invoked
  */
-function closeRedirectEdit(save) {
+closeRedirectEdit = function(save) {
 	$('.edit-group').fadeOut(300, function() {
 		$('#redirectSummaryWrapper').fadeIn(300);
 		$('.add-redirect').css("visibility", "visible");
@@ -475,17 +445,17 @@ function closeRedirectEdit(save) {
 			showAlert('Well Done!', 'The changes have been successfully saved.', 'alert-success');
 		}
 	});
-}
+};
 
-function showNodeList() {
+showNodeList = function() {
 	$('#modal-select-node').modal();
 	// Allow double click
 	$('.radio-node').parent('label').dblclick(function() {
 		selectNodeFromList();
 	});
-}
+};
 
-function selectNodeFromList() {
+selectNodeFromList = function() {
 	sNode = $(".radio-node:checked").attr("id");
 	setTimeout(function() {
 		nodeInput.focus();
@@ -493,7 +463,7 @@ function selectNodeFromList() {
 	}, 50);
 	$('#modal-select-node').modal('hide');
 	return false;
-}
+};
 
 /*
 // Anchor animation
@@ -528,3 +498,100 @@ anchorAnimation = function() {
 
 /* Modal Import Site */
 
+    $(document).ready(function(){
+        bootstrapDropdown();
+        bootstrapTooltip();
+        bootstrapAlert();
+        bootstrapPopover();
+        bootstrapButton();
+        bootstrapModal();
+        bootstrapTypeahead();
+        // Useful js
+        button();
+        toggleContent();
+        showHideMore();
+        radioBackground();
+        clearInputTextValue();
+        switchGroupView();
+        selectGroupInHierarchicalView();
+        // Provisional js
+        selectPermission();
+        accessPermissionButton();
+        accessPermissionTable();
+        feedback();
+        editRedirect();
+        onConditionModal();
+        // Useful js that makes other ones not work
+        sortable();
+
+        console.log("1");
+        $(".sortable-rdr").load(function(){
+            console.log("loaded");
+        });
+        console.log("2");
+        $(document).on("focus",".sortable-rdr", function(){
+            console.log("focus");
+        });
+        console.log("3");
+        $(document).on("load",".sortable-rdr", function(){
+            console.log("load");
+        });
+        console.log("4");
+        $(document).on("blur",".sortable-rdr", function(){
+            console.log("blur");
+        });
+        console.log("5");
+        $(document).on("mouseover",".sortable-rdr", function(){
+            console.log("mouseover");
+        });
+        console.log('a1');
+
+        $(document).ajaxSuccess(function(event, request, settings) {
+            console.log( "!!!!!!!!!!!!!!1" );
+        });
+
+
+        $(document).ajaxSuccess(function(event, xhr, settings) {
+            console.log( "!!!!!!!!!!!!!!!!!!2" );
+        });
+
+        window.jQuery(document).ajaxSuccess(function(event, request, settings) {
+            console.log( "!!!!!!!!!!!!!!1" );
+        });
+
+
+        window.jQuery(document).ajaxSuccess(function(event, xhr, settings) {
+            console.log( "!!!!!!!!!!!!!!!!!!2" );
+        });
+
+        jQuery(document).ajaxSuccess(function(event, request, settings) {
+            console.log( "!!!!!!!!!!!!!!1" );
+        });
+
+
+        jQuery(document).ajaxSuccess(function(event, xhr, settings) {
+            console.log( "!!!!!!!!!!!!!!!!!!2" );
+        });
+
+        console.log('a2');
+    });
+
+    jQuery(document).ajaxSuccess(function(event, request, settings) {
+        console.log( "!!!!!!!!!!!!!!!!!3" );
+    });
+
+
+    $(document).ajaxSuccess(function(event, xhr, settings) {
+        console.log( "!!!!!!!!!!!!!!!!4" );
+    });
+
+    /*
+    console.log("$.fn.jquery: " + $.fn.jquery);
+    console.log("jQuery.fn.jquery: " + jQuery.fn.jquery);
+    console.log("window.jQuery.fn.jquery: " + window.jQuery.fn.jquery);
+
+    console.log("$.ui.version: " + $.ui.version );
+    console.log("window.jQuery.ui.version: " + window.jQuery.ui.version );
+      */
+
+})(window.jQuery);
