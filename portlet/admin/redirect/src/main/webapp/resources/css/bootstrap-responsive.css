@@ -231,8 +231,10 @@
     width: 82.90598290598291%;
     *width: 82.8527914166212%;
   }
+
+  /* Width of main pane */
   .RedirectAdmin .row-fluid .span9 {
-    width: 74.35897435897436%;
+    width: 76.2%;
     *width: 74.30578286961266%;
   }
   .RedirectAdmin .row-fluid .span8 {
@@ -255,8 +257,10 @@
     width: 31.623931623931625%;
     *width: 31.570740134569924%;
   }
+
+    /* Width of menu pane */
   .RedirectAdmin .row-fluid .span3 {
-    width: 23.076923076923077%;
+    width: 220px;
     *width: 23.023731587561375%;
   }
   .RedirectAdmin .row-fluid .span2 {
