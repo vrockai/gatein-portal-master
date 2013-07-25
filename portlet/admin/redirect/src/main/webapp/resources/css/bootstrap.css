@@ -368,6 +368,7 @@ a {
   *width: 82.92553191489361%;
 }
 
+/* Width of main pane */
 .RedirectAdmin .row-fluid .span9 {
   width: 74.46808510638297%;
   *width: 74.41489361702126%;
@@ -398,6 +399,7 @@ a {
   *width: 31.861702127659576%;
 }
 
+/* Width of the menu pane */
 .RedirectAdmin .row-fluid .span3 {
   width: 23.404255319148934%;
   *width: 23.351063829787233%;
