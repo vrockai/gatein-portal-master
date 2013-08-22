@@ -29,8 +29,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 
 import org.exoplatform.container.PortalContainer;
 import org.gatein.management.api.ContentType;
@@ -45,6 +48,16 @@ import org.richfaces.model.UploadedFile;
 @ManagedBean(name = "importer")
 @SessionScoped
 public class ImportSiteBean implements Serializable {
+
+    private UIComponent component;
+
+    public UIComponent getComponent() {
+        return component;
+    }
+
+    public void setComponent(UIComponent component) {
+        this.component = component;
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -76,17 +89,25 @@ public class ImportSiteBean implements Serializable {
         UploadedFile item = event.getUploadedFile();
 
         ManagementController controller = (ManagementController) PortalContainer.getComponent(ManagementController.class);
-
         Map<String, List<String>> attributes = new HashMap<String, List<String>>(1);
         attributes.put("importMode", Collections.singletonList(importMode));
-
         ManagedRequest request = ManagedRequest.Factory.create(OperationNames.IMPORT_RESOURCE,
                 PathAddress.pathAddress("mop"), attributes, item.getInputStream(), ContentType.ZIP);
-
-        ManagedResponse response = controller.execute(request);
-        if (!response.getOutcome().isSuccess()) {
-            throw new Exception(response.getOutcome().getFailureDescription());
+        try {
+            ManagedResponse response = controller.execute(request);
+            if (!response.getOutcome().isSuccess()) {
+                addMessage(item.getName());
+                throw new Exception(response.getOutcome().getFailureDescription());
+            }
+        } catch (Exception e) {
+            addMessage(item.getName());
+            throw e;
         }
     }
 
+    public void addMessage(String filename){
+        final FacesContext context = FacesContext.getCurrentInstance();
+        final FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, filename, null);
+        context.addMessage(component.getClientId(), facesMsg);
+    }
 }

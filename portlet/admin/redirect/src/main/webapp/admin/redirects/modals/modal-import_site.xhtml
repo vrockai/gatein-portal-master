@@ -31,6 +31,7 @@
 			background: none;
 			font-size: 14px;
 		}
+
 		.rf-fu-btn-upl {
 			visibility: hidden;
 		}
@@ -46,6 +47,7 @@
 			margin-top: 7px;
 			margin-left: 5px;
 		}
+
 		.rf-fu-itm-lbl {
 			font-size: 14px;
 		}
@@ -61,6 +63,15 @@
 			height: 0;
 			margin: 0;
 		}
+
+		.rf-fu-itm.error {
+			background: #f0dfd8;
+		}
+
+		.rf-fu-itm.success {
+			background: #dff0d8;
+		}
+
 	</style>
 
 	<h:form id="form-import-site">
@@ -72,7 +83,7 @@
 		<div class="modal-body">
 			<div id="file-input-holder" class="control-group">
 				<rich:fileUpload id="upload" acceptedTypes="zip"
-                                 maxFilesQuantity="5" noDuplicate="true"
+                                 maxFilesQuantity="1" noDuplicate="true"
                                  fileUploadListener="#{importer.importSite}"
                                  ontyperejected="alert('#{msg['redirect.admin.import.alert']}');"
                                  deleteLabel="#{msg['redirect.admin.import.remove']}"
@@ -80,12 +91,12 @@
                                  uploadLabel="#{msg['redirect.admin.import.import']}"
                                  clearLabel="#{msg['redirect.admin.import.clear']}"
                                  clearAllLabel="#{msg['redirect.admin.import.clearall']}"
-                                 onfileselect="$('#no-sites-div').hide();" >
-					<a4j:ajax event="uploadcomplete" execute="@none" render="info" />
-					<f:facet name="progress">
-						<rich:progressBar style="display: none;" onfinish="onFileUploaded($(this));" />
-					</f:facet>
+                                 onfileselect="$('#no-sites-div').hide();"
+                                 onuploadcomplete="checkErrors()">
 				</rich:fileUpload>
+			  <a4j:outputPanel id="uploadErrors" binding="${importer.component}">
+			    <rich:message for="uploadErrors" layout="list" style="display:none;"/>
+			  </a4j:outputPanel>
 			</div><!-- End .control-group -->
 			<br />
 			<div class="control-group">
@@ -104,9 +115,17 @@
 	</h:form>
 
 	<script type="text/javascript">
-		function onFileUploaded(el) {
-			el.parent().parent().parent().css('background-color','#dff0d8');
+		function checkErrors(){
+			var errs = $("span[id$=uploadErrors] .rf-msg-det");
+
+			if (errs.size() > 0){
+				$(".rf-fu-itm").addClass("error");
+				alert("#{msg['redirect.admin.import.error']} " + errs.html());
+			} else {
+				$(".rf-fu-itm").addClass("success");
+			}
 		}
+
 		$(document).ready(function () {
 			$(".rf-fu-btn-cnt-add").addClass("icon-download-alt").css("width", "auto");
 			$(".rf-fu-btn-add").addClass("btn");
