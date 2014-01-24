@@ -6,6 +6,32 @@
 			 xmlns:a4j="http://richfaces.org/a4j"
 			 xmlns:b="http://richfaces.org/sandbox/bootstrap">
 
+	<script>
+		$(document).ready(function(){
+			$('.dropdown-menu a').on('focusout', function(e){
+				// Loosing focus from the dropdown item closes the dropdown
+				$(this).closest('.dropdown').removeClass('open');
+			});
+
+			$('.site-link').on('keydown', function(e){
+				var code = e.keyCode || e.which;
+				var shift = e.shiftKey;
+				// If shift-tab is pressed, close current drop-down
+				if (code == '9' &amp;&amp; shift) {
+					$(this).closest('.dropdown').removeClass('open');
+				}
+			});
+
+			$('.site-link').on('keyup', function(e){
+				var code = e.keyCode || e.which;
+				// If tab is pressed, open newly focused dropdown
+				if (code == '9') {
+					$(this).next('.dropdown-toggle').dropdown('toggle');
+				}
+			});
+		});
+	</script>
+
 	<h:form id="menu_form" class="menu_form">
 		<nav id="local-nav">
 			<ul class="nav nav-list">
@@ -17,7 +43,7 @@
 					<ul>
 						<ui:repeat value="#{rdrs.sites}" var="s" varStatus="counter">
 							<li class="dropdown #{rdrs.siteName == s.name ? 'active' : ''} #{counter.index > 3 ? 'extra hidden-element' : ''}">
-								<a4j:commandLink action="#{rdrs.setSiteName(s.name)}" styleClass="site-link" onclick="$('.edit-group').hide();" onfocus="$(this).next('.dropdown-toggle').click(); return false;" render="@form :sum_form :add_form :form-select-node">
+								<a4j:commandLink action="#{rdrs.setSiteName(s.name)}" styleClass="site-link" onclick="$('.edit-group').hide();" render="@form :sum_form :add_form :form-select-node">
 									<b:icon value="globe" color="grey" /> #{s.name}
 								</a4j:commandLink>
 								<span class="dropdown-toggle" data-toggle="dropdown"><i class="icon-opened icon-gray">View actions...</i></span>
